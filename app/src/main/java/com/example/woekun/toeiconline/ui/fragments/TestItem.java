@@ -36,17 +36,17 @@ public class TestItem extends Fragment {
         if (getArguments() != null) {
             position = getArguments().getInt(Const.POSITION);
             TestPagerAdapter testPagerAdapter = TestPagerAdapter.getInstance();
-            if(position<=10){
+            if(position<10){
                 questions = testPagerAdapter.getAllQuestionByPart(0);
-            }else if(position<=40){
+            }else if(position<40){
                 questions = testPagerAdapter.getAllQuestionByPart(1);
-            }else if(position<=70){
+            }else if(position<70){
                 questions = testPagerAdapter.getAllQuestionByPart(2);
-            }else if(position<=100){
+            }else if(position<100){
                 questions = testPagerAdapter.getAllQuestionByPart(3);
-            }else if(position<=140){
+            }else if(position<140){
                 questions = testPagerAdapter.getAllQuestionByPart(4);
-            }else if(position<=152){
+            }else if(position<152){
                 questions = testPagerAdapter.getAllQuestionByPart(5);
             }else {
                 questions = testPagerAdapter.getAllQuestionByPart(6);

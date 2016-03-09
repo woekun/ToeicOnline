@@ -162,11 +162,11 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
             if(position<10) {
                 setAudio(allQuestionForTest.get(0).get(position).getAudio());
             }else if(position<40){
-                setAudio(allQuestionForTest.get(1).get(position-39).getAudio());
+                setAudio(allQuestionForTest.get(1).get(position-9).getAudio());
             }else if(position<50){
-                setAudio(allQuestionForTest.get(2).get(position-49).getAudio());
+                setAudio(allQuestionForTest.get(2).get(position-9).getAudio());
             }else if(position<60){
-                setAudio(allQuestionForTest.get(2).get(position-59).getAudio());
+                setAudio(allQuestionForTest.get(2).get(position-9).getAudio());
             }
         }
 
