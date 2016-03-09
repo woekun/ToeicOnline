@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">ToeicOnline</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_question">QuestionActivity</string>
+    <string name="facebook_app_id">1008173429253673</string>
+
+    <string-array name="part_list_training">
+        <item>Part 1: Photo</item>
+        <item>Part 2: Question - Response</item>
+        <item>Part 3: Short Conversation</item>
+        <item>Part 4: Short Talk</item>
+        <item>Part 5: Incomplete Sentence</item>
+        <item>Part 6: Text Completion</item>
+        <item>Part 7: Reading</item>
+    </string-array>
+
+    <string name="title_activity_lobby">Lobby</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Log in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="notification_sign_up">By clicking Sign Up, you agree our <b>Term</b></string>
+    <string name="test_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_flash">FlashActivity</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_activity_test">ActivityTest</string>
+</resources>
