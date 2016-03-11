@@ -47,4 +47,10 @@ public class SubmitTestFragment extends Fragment implements View.OnClickListener
     private int scoreCalculator(){
         return 0;
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        appController = null;
+    }
 }

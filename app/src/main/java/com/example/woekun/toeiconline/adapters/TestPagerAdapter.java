@@ -35,7 +35,7 @@ public class TestPagerAdapter extends FragmentStatePagerAdapter {
         return 200;
     }
 
-    public ArrayList<Question> getAllQuestionByPart(int index){
-        return allQuestionForTest.get(index);
+    public Question getQuestionByPart(int part, int position){
+        return allQuestionForTest.get(part).get(position);
     }
 }

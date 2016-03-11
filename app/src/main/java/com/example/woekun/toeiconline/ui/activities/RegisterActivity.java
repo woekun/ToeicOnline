@@ -28,18 +28,19 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     public final String TAG = RegisterActivity.class.getSimpleName();
 
-
     // UI references.
     private EditText mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mRegFormView;
     private Button mEmailRegInButton;
+
+    private AppController appController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        appController = AppController.getInstance();
 
         mEmailView = (EditText) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -53,8 +54,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 return false;
             }
         });
-        mProgressView = findViewById(R.id.reg_progress);
-        mRegFormView = findViewById(R.id.email_register_form);
+
         mEmailRegInButton = (Button) findViewById(R.id.email_sign_up_button);
         mEmailRegInButton.setOnClickListener(this);
     }
@@ -97,7 +97,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
 
             Register(email,password);
         }
@@ -107,18 +106,19 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         APIs.register(email, password, new APIs.RegisterCallBack() {
             @Override
             public void onSuccess(User user) {
-                showProgress(false);
+
                 startActivityForResult(new Intent(RegisterActivity.this,
-                        MainActivity.class), Const.REG_REQUEST);
-                new DatabaseHelper(RegisterActivity.this).addUser(user);
-                AppController.getInstance().getSharedPreferences().edit().putString(Const.EMAIL,email).apply();
+                        FlashScreen.class), Const.REG_REQUEST);
+                appController.getDatabaseHelper().addUser(user);
+                appController.getSharedPreferences().edit().putString(Const.EMAIL, email).apply();
+                appController.getSharedPreferences().edit().putString(Const.LEVEL, "1").apply();
                 finish();
             }
 
             @Override
             public void onFailed(String message) {
                 Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-                showProgress(false);
+
             }
         });
     }
@@ -129,34 +129,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             attemptSignUp();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mRegFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mRegFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mRegFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mRegFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        appController = null;
     }
 }

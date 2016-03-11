@@ -108,4 +108,9 @@ public class InformationFragment extends Fragment implements View.OnClickListene
 
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        appController = null;
+    }
 }

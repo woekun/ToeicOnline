@@ -16,13 +16,13 @@ import java.util.ArrayList;
 
 public class TestItem extends Fragment {
     private int position;
-    private ArrayList<Question> questions;
+    private Question question;
 
-    public TestItem(){
+    public TestItem() {
 
     }
 
-    public static TestItem newInstance(int position){
+    public static TestItem newInstance(int position) {
         TestItem fragment = new TestItem();
         Bundle bundle = new Bundle();
         bundle.putInt(Const.POSITION, position);
@@ -36,20 +36,20 @@ public class TestItem extends Fragment {
         if (getArguments() != null) {
             position = getArguments().getInt(Const.POSITION);
             TestPagerAdapter testPagerAdapter = TestPagerAdapter.getInstance();
-            if(position<10){
-                questions = testPagerAdapter.getAllQuestionByPart(0);
-            }else if(position<40){
-                questions = testPagerAdapter.getAllQuestionByPart(1);
-            }else if(position<70){
-                questions = testPagerAdapter.getAllQuestionByPart(2);
-            }else if(position<100){
-                questions = testPagerAdapter.getAllQuestionByPart(3);
-            }else if(position<140){
-                questions = testPagerAdapter.getAllQuestionByPart(4);
-            }else if(position<152){
-                questions = testPagerAdapter.getAllQuestionByPart(5);
-            }else {
-                questions = testPagerAdapter.getAllQuestionByPart(6);
+            if (position < 10) {
+                question = testPagerAdapter.getQuestionByPart(0, position);
+            } else if (position < 40) {
+                question = testPagerAdapter.getQuestionByPart(1,position-10);
+            } else if (position < 70) {
+
+            } else if (position < 100) {
+
+            } else if (position < 140) {
+
+            } else if (position < 152) {
+
+            } else {
+
             }
         }
     }
@@ -64,7 +64,6 @@ public class TestItem extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         QuestionView questionView = (QuestionView) view.findViewById(R.id.test_question_view);
         questionView.setMode(QuestionView.TEST);
-        Question question = questions.get(position);
         questionView.setQuestion(question);
         questionView.setPosition(position);
     }

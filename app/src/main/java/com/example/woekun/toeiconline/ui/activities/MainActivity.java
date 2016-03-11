@@ -15,7 +15,7 @@ import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.R;
 import com.example.woekun.toeiconline.utils.Utils;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private AppController appController;
     private SharedPreferences sharedPreferences;
@@ -30,11 +30,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initView();
     }
 
-    private void initView(){
+    private void initView() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
-        TextView yourRank = (TextView)findViewById(R.id.your_rank);
+        TextView yourRank = (TextView) findViewById(R.id.your_rank);
         yourRank.setOnClickListener(this);
 
         ImageView general = (ImageView) findViewById(R.id.general);
@@ -55,50 +55,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(MainActivity.this,LobbyActivity.class);
+        Intent intent = new Intent(MainActivity.this, LobbyActivity.class);
         int level = Integer.valueOf(sharedPreferences.getString(Const.LEVEL, "1"));
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.fab:
-                intent.putExtra(Const.TYPE,Const.INFO);
+                intent.putExtra(Const.TYPE, Const.INFO);
                 startActivity(intent);
                 break;
             case R.id.your_rank:
-                intent.putExtra(Const.TYPE,Const.RANK);
+                intent.putExtra(Const.TYPE, Const.RANK);
                 startActivity(intent);
                 break;
             case R.id.to500:
-                if(level>=2) {
-                    sharedPreferences.edit().putBoolean(Const.TEST,false).apply();
+                if (level >= 2) {
+                    sharedPreferences.edit().putBoolean(Const.TEST, false).apply();
                     intent.putExtra(Const.TYPE, Const.TRAIN);
                     startActivity(intent);
-                }else {
-                    Utils.dialogTestConfirm(this,"This level does not fit you!! Do you want to test?",2);
+                } else {
+                    Utils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 2);
                 }
                 break;
             case R.id.to700:
-                if(level>=3) {
-                    sharedPreferences.edit().putBoolean(Const.TEST,false).apply();
+                if (level >= 3) {
+                    sharedPreferences.edit().putBoolean(Const.TEST, false).apply();
                     intent.putExtra(Const.TYPE, Const.TRAIN);
                     startActivity(intent);
-                }else {
-                    Utils.dialogTestConfirm(this,"This level does not fit you!! Do you want to test?",3);
+                } else {
+                    Utils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 3);
                 }
                 break;
             case R.id.to900:
-                if(level>=4) {
-                    sharedPreferences.edit().putBoolean(Const.TEST,false).apply();
+                if (level >= 4) {
+                    sharedPreferences.edit().putBoolean(Const.TEST, false).apply();
                     intent.putExtra(Const.TYPE, Const.TRAIN);
                     startActivity(intent);
-                }else {
-                    Utils.dialogTestConfirm(this,"This level does not fit you!! Do you want to test?",4);
+                } else {
+                    Utils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 4);
                 }
                 break;
             case R.id.general:
                 Toast.makeText(MainActivity.this, "update latter", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.test:
-                Utils.dialogTestConfirm(this, "Are you sure you want to test?",4);
+                Utils.dialogTestConfirm(this, "Are you sure you want to test?", 4);
                 break;
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        appController = null;
     }
 }

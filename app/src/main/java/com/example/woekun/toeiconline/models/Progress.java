@@ -1,13 +1,12 @@
 package com.example.woekun.toeiconline.models;
 
-/**
- * Created by woekun on 20/2/2016.
- */
 public class Progress {
     private String email;
     private int subQuestionID;
     private int part;
     private int answerPicked;
+
+    private int isTrue;
 
     public Progress(){
 
@@ -16,6 +15,13 @@ public class Progress {
     public Progress(int subQuestionID, int answerPicked) {
         this.subQuestionID = subQuestionID;
         this.answerPicked = answerPicked;
+    }
+
+    public Progress(int subQuestionID, int part, int answerPicked, int isTrue) {
+        this.subQuestionID = subQuestionID;
+        this.part = part;
+        this.answerPicked = answerPicked;
+        this.isTrue = isTrue;
     }
 
     public Progress(String email, int subQuestionID, int part, int answerPicked) {
@@ -55,5 +61,13 @@ public class Progress {
 
     public void setAnswerPicked(int answerPicked) {
         this.answerPicked = answerPicked;
+    }
+
+    public int getIsTrue() {
+        return isTrue;
+    }
+
+    public void setIsTrue(int isTrue) {
+        this.isTrue = isTrue;
     }
 }

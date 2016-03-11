@@ -2,6 +2,7 @@ package com.example.woekun.toeiconline.ui.activities;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
@@ -26,7 +27,7 @@ import com.example.woekun.toeiconline.utils.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, MediaPlayer.OnPreparedListener {
+public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener, OnCompletionListener {
 
     private AppController appController;
 
@@ -35,16 +36,15 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     private MediaPlayer mediaPlayer;
     private SeekBar songProgressBar;
     private LinearLayout audioLayout;
-    private ImageButton playButton;
     private TextView songProgressText;
+    private TextView time_limit;
 
     private onPageChangeListener mOnPageChangeListener = new onPageChangeListener();
     private Handler mHandler = new Handler();
 
     private ArrayList<ArrayList<Question>> allQuestionForTest;
-    private int level;
-    private String email;
     private long totalDuration;
+    private int limit = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,40 +54,38 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        time_limit = (TextView) findViewById(R.id.time_limit);
         appController = AppController.getInstance();
 
-        level = getIntent().getIntExtra(Const.LEVEL, 4);
-        setAllQuestionForTest(String.valueOf(level));
+        int level = getIntent().getIntExtra(Const.LEVEL, 4);
+        if (level == 1) {
+            setAllQuestionForTest(String.valueOf(4));
+        } else {
+            setAllQuestionForTest(String.valueOf(level));
+        }
 
         testPagerAdapter = new TestPagerAdapter(getSupportFragmentManager(), allQuestionForTest);
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(testPagerAdapter);
 
         audioLayout = (LinearLayout) findViewById(R.id.seek_bar_view);
-        playButton = (ImageButton) findViewById(R.id.play_button);
         songProgressBar = (SeekBar) findViewById(R.id.seek_bar);
         songProgressText = (TextView) findViewById(R.id.time_audio);
 
         initAudioController(1);
+        Utils.countDownTimer(time_limit);
     }
 
-    private void initAudioController(int partId){
+    private void initAudioController(int partId) {
         if (checkPart(String.valueOf(partId))) {
             audioLayout.setVisibility(View.VISIBLE);
             mediaPlayer = new MediaPlayer();
 
+
             mViewPager.addOnPageChangeListener(mOnPageChangeListener);
-            mOnPageChangeListener.onPageSelected(0);
-            playButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!mediaPlayer.isPlaying())
-                        mediaPlayer.start();
-                    else
-                        mediaPlayer.pause();
-                }
-            });
-            songProgressBar.setOnSeekBarChangeListener(this);
+            if (partId == 1)
+                mOnPageChangeListener.onPageSelected(0);
+
         } else {
             audioLayout.setVisibility(View.GONE);
         }
@@ -96,10 +94,11 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     private void setAllQuestionForTest(String level) {
         allQuestionForTest = new ArrayList<>();
 
-        DatabaseHelper databaseHelper = AppController.getInstance().getDatabaseHelper();
+        DatabaseHelper databaseHelper = appController.getDatabaseHelper();
         for (int i = 1; i < 8; i++) {
             allQuestionForTest.add(databaseHelper.getQuestionsForTest(level, String.valueOf(i)));
         }
+
     }
 
     private void setAudio(String audioUri) {
@@ -109,6 +108,7 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
             mediaPlayer.setDataSource(Const.BASE_AUDIO_URL + audioUri + ".mp3");
             mediaPlayer.prepareAsync();
             mediaPlayer.setOnPreparedListener(this);
+            mediaPlayer.setOnCompletionListener(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,33 +122,23 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         return Integer.valueOf(partId) <= 4;
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-        mHandler.removeCallbacks(mUpdateTimeTask);
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-        mHandler.removeCallbacks(mUpdateTimeTask);
-        int currentPosition = Utils.progressToTimer(seekBar.getProgress(), (int) totalDuration);
-
-        // forward or backward to certain seconds
-        mediaPlayer.seekTo(currentPosition);
-
-        // update timer progress again
-        updateProgressBar();
-    }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        mp.start();
         totalDuration = mp.getDuration();
     }
 
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        if (++limit < 2) {
+            songProgressBar.setProgress(0);
+            mp.start();
+        } else {
+            limit = 0;
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
+        }
+    }
 
     public class onPageChangeListener implements ViewPager.OnPageChangeListener {
 
@@ -159,14 +149,14 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         @Override
         public void onPageSelected(int position) {
-            if(position<10) {
+            if (position < 10) {
                 setAudio(allQuestionForTest.get(0).get(position).getAudio());
-            }else if(position<40){
-                setAudio(allQuestionForTest.get(1).get(position-9).getAudio());
-            }else if(position<50){
-                setAudio(allQuestionForTest.get(2).get(position-9).getAudio());
-            }else if(position<60){
-                setAudio(allQuestionForTest.get(2).get(position-9).getAudio());
+            } else if (position < 40) {
+                setAudio(allQuestionForTest.get(1).get(position - 10).getAudio());
+            } else if (position < 50) {
+                setAudio(allQuestionForTest.get(2).get(position - 10).getAudio());
+            } else if (position < 60) {
+                setAudio(allQuestionForTest.get(3).get(position - 10).getAudio());
             }
         }
 
@@ -182,7 +172,7 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
-            if(mediaPlayer!=null) {
+            if (mediaPlayer != null) {
                 long currentDuration = mediaPlayer.getCurrentPosition();
 
                 songProgressText.setText(String.format("%s/%s",
@@ -207,22 +197,7 @@ public class TestActivity extends AppCompatActivity implements SeekBar.OnSeekBar
             mediaPlayer.release();
             mediaPlayer = null;
         }
+        appController = null;
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_activity_test, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
 
 }

@@ -1,5 +1,6 @@
 package com.example.woekun.toeiconline.utils;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,8 @@ import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
+import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -19,22 +22,26 @@ import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.ui.activities.TestActivity;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 public class Utils {
 
-    public static CountDownTimer countDownTimer() {
-        return new CountDownTimer(3000, 1000) {
+    public static CountDownTimer countDownTimer(final TextView view) {
+         return new CountDownTimer(180000,1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-
+                String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
+                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
+                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)));
+                view.setText(hms);
             }
 
             @Override
             public void onFinish() {
-
+                view.setText("00:00:00");
             }
-        };
+        }.start();
     }
 
     public static void dialogTestConfirm(final Context context, String message, final int level) {
@@ -48,12 +55,16 @@ public class Utils {
                         Intent intent = new Intent(context, TestActivity.class);
                         intent.putExtra(Const.LEVEL, level);
                         context.startActivity(intent);
+                        ((Activity)context).finish();
                         AppController.getInstance().getSharedPreferences().edit().putBoolean(Const.TEST, true).apply();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
+                        if(level!=4)
+                            ((Activity)context).finish();
+                        AppController.getInstance().getSharedPreferences().edit().putBoolean(Const.TEST, false).apply();
                     }
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -70,29 +81,9 @@ public class Utils {
     }
 
     public static String milliSecondsToTimer(long milliseconds) {
-        String finalTimerString = "";
-        String secondsString;
-
-        // Convert total duration into time
-        int hours = (int) (milliseconds / (1000 * 60 * 60));
-        int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
-        int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
-        // Add hours if there
-        if (hours > 0) {
-            finalTimerString = hours + ":";
-        }
-
-        // Prepending 0 to seconds if it is one digit
-        if (seconds < 10) {
-            secondsString = "0" + seconds;
-        } else {
-            secondsString = "" + seconds;
-        }
-
-        finalTimerString = finalTimerString + minutes + ":" + secondsString;
-
-        // return timer string
-        return finalTimerString;
+        return String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(milliseconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliseconds)),
+                TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
     }
 
     public static int getProgressPercentage(long currentDuration, long totalDuration) {

@@ -38,8 +38,8 @@ public class QuestionPagerAdapter extends FragmentStatePagerAdapter {
         return questions.size();
     }
 
-    public ArrayList<Question> getQuestions(){
-        return questions;
+    public Question getQuestion(int position){
+        return questions.get(position);
     }
 
 }

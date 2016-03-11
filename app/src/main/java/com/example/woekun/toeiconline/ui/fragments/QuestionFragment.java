@@ -225,5 +225,6 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
             mediaPlayer.release();
             mediaPlayer = null;
         }
+        appController = null;
     }
 }

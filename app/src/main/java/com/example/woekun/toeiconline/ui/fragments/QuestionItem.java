@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class QuestionItem extends Fragment {
     private int position;
-    private ArrayList<Question> questions;
+    private Question question;
 
     public QuestionItem() {
         // Required empty public constructor
@@ -36,8 +36,8 @@ public class QuestionItem extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            questions = QuestionPagerAdapter.getInstance().getQuestions();
             position = getArguments().getInt(Const.POSITION);
+            question = QuestionPagerAdapter.getInstance().getQuestion(position);
         }
     }
 
@@ -52,7 +52,6 @@ public class QuestionItem extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         QuestionView questionView = (QuestionView) view.findViewById(R.id.test_question_view);
-        Question question = questions.get(position);
         questionView.setQuestion(question);
         questionView.setPosition(position);
 

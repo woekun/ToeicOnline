@@ -8,67 +8,81 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.woekun.toeiconline.AppController;
+import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.R;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 
 public class AnalyzeFragment extends Fragment implements OnChartGestureListener {
-    private BarChart mChart;
-    public int a;
+    private LineChart mChart;
+    private ArrayList<Integer> scores;
+    private String email;
 
+    private AppController appController;
 
     public AnalyzeFragment() {
         // Required empty public constructor
     }
 
-
     public static AnalyzeFragment newInstance() {
-        AnalyzeFragment fragment = new AnalyzeFragment();
-        return fragment;
+        return new AnalyzeFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        appController = AppController.getInstance();
 
+        email = appController.getSharedPreferences().getString(Const.EMAIL,null);
+        scores = appController.getDatabaseHelper().getScore(email);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_analyze, container, false);
-        mChart = (BarChart)view.findViewById(R.id.chart1);
-        mChart.setDescription("# of times Alice called Bob");
+        mChart = (LineChart)view.findViewById(R.id.chart1);
+        mChart.setDescription("");
         mChart.setOnChartGestureListener(this);
 
-        ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(4f, 0));
-        entries.add(new BarEntry(8f, 1));
-        entries.add(new BarEntry(6f, 2));
-        entries.add(new BarEntry(12f, 3));
-        entries.add(new BarEntry(18f, 4));
-        entries.add(new BarEntry(9f, 5));
+        mChart.getAxisLeft().setDrawGridLines(false);
+        mChart.getXAxis().setDrawGridLines(false);
+
+
+        ArrayList<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(200, 0));
+        entries.add(new Entry(800, 1));
+        entries.add(new Entry(300, 2));
+        entries.add(new Entry(500, 3));
+        entries.add(new Entry(900, 4));
+
 
         ArrayList<String> labels = new ArrayList<>();
-        labels.add("January");
-        labels.add("February");
-        labels.add("March");
-        labels.add("April");
-        labels.add("May");
-        labels.add("June");
+        labels.add("1");
+        labels.add("2");
+        labels.add("3");
+        labels.add("4");
+        labels.add("5");
 
-        BarDataSet dataset = new BarDataSet(entries, "# of Calls");
-        BarData data = new BarData(labels, dataset);
+        LineDataSet dataset = new LineDataSet(entries, "# of Score");
+        dataset.setDrawFilled(true);
+        dataset.setColors(ColorTemplate.COLORFUL_COLORS);
+        LineData data = new LineData(labels, dataset);
         mChart.setData(data);
         mChart.animateX(1000);
         mChart.animateY(1000);

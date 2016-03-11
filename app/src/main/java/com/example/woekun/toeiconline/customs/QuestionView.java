@@ -183,13 +183,14 @@ public class QuestionView extends LinearLayout {
                         break;
                 }
 
-                String email = appController.getSharedPreferences().getString(Const.EMAIL, null);
                 if (mode.equals(TRAINING)) {
+                    String email = appController.getSharedPreferences().getString(Const.EMAIL, null);
                     appController.getDatabaseHelper().setProgress(
                             new Progress(email, subQuestion.getSubQuestionID(), part, answerPicked[0]));
                 } else if (mode.equals(TEST)) {
                     appController.getDatabaseHelper().setProgressTest(
-                            new Progress(email, subQuestion.getSubQuestionID(), part, answerPicked[0]));
+                            new Progress(subQuestion.getSubQuestionID(), part, answerPicked[0],
+                                    (answerPicked[0]==subQuestion.getResult()) ? 1: 0));
                 }
             }
         });
@@ -199,14 +200,14 @@ public class QuestionView extends LinearLayout {
             check.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(isChecked){
+                    if (isChecked) {
                         isChecked = false;
                         if (answerPicked[0] > 0)
                             (answerField.getChildAt(answerPicked[0] - 1)).setBackgroundColor(Color.WHITE);
 
                         (answerField.getChildAt(subQuestion.getResult() - 1)).setBackgroundColor(Color.WHITE);
-                    }else {
-                        isChecked=true;
+                    } else {
+                        isChecked = true;
                         if (answerPicked[0] > 0)
                             (answerField.getChildAt(answerPicked[0] - 1)).setBackgroundColor(Color.RED);
 
