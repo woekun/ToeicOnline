@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class TestItem extends Fragment {
     private int position;
     private Question question;
+    private Integer[] partSize = new Integer[7];
 
     public TestItem() {
 
@@ -33,23 +34,28 @@ public class TestItem extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TestPagerAdapter testPagerAdapter = TestPagerAdapter.getInstance();
+        for (int i = 0; i < 7; i++) {
+            partSize[i] = testPagerAdapter.getQuestionSize(i);
+        }
+
         if (getArguments() != null) {
             position = getArguments().getInt(Const.POSITION);
-            TestPagerAdapter testPagerAdapter = TestPagerAdapter.getInstance();
-            if (position < 10) {
+
+            if (position < partSize[0]) {
                 question = testPagerAdapter.getQuestionByPart(0, position);
-            } else if (position < 40) {
-                question = testPagerAdapter.getQuestionByPart(1,position-10);
-            } else if (position < 70) {
-
-            } else if (position < 100) {
-
-            } else if (position < 140) {
-
-            } else if (position < 152) {
-
-            } else {
-
+            } else if (position < partSize[0] + partSize[1]) {
+                question = testPagerAdapter.getQuestionByPart(1, position - partSize[0]);
+            } else if (position < partSize[0] + partSize[1] + partSize[2]) {
+                question = testPagerAdapter.getQuestionByPart(2, position - partSize[0] - partSize[1]);
+            } else if (position < partSize[0] + partSize[1] + partSize[2] + partSize[3]) {
+                question = testPagerAdapter.getQuestionByPart(3, position - partSize[0] - partSize[1] - partSize[2]);
+            } else if (position < partSize[0] + partSize[1] + partSize[2] + partSize[3] + partSize[4]) {
+                question = testPagerAdapter.getQuestionByPart(4, position - partSize[0] - partSize[1] - partSize[2] - partSize[3]);
+            } else if (position < partSize[0] + partSize[1] + partSize[2] + partSize[3] + partSize[4] + partSize[5]) {
+                question = testPagerAdapter.getQuestionByPart(5, position - partSize[0] - partSize[1] - partSize[2] - partSize[3] - partSize[4]);
+            } else if (position < partSize[0] + partSize[1] + partSize[2] + partSize[3] + partSize[4] + partSize[5] + partSize[6]) {
+                question = testPagerAdapter.getQuestionByPart(6, position - partSize[0] - partSize[1] - partSize[2] - partSize[3] - partSize[4] - partSize[5]);
             }
         }
     }

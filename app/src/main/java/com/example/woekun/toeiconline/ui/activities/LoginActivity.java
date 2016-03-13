@@ -186,7 +186,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 appController.getSharedPreferences().edit().putString(Const.EMAIL, email).apply();
                 appController.getSharedPreferences().edit().putString(Const.LEVEL, user.getLevel()).apply();
-                startActivity(new Intent(LoginActivity.this,FlashScreen.class));
+                startActivity(new Intent(LoginActivity.this, FlashScreen.class));
             }
 
             @Override
@@ -200,14 +200,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Const.REG_REQUEST && resultCode == RESULT_OK)
+        if (requestCode == Const.REQUEST && resultCode == RESULT_OK)
             finish();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
         appController = null;
+        super.onDestroy();
     }
 }
 

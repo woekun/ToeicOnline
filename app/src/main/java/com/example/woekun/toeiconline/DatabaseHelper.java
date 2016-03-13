@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
 
 import com.example.woekun.toeiconline.models.Progress;
 import com.example.woekun.toeiconline.models.Question;
@@ -13,6 +14,7 @@ import com.example.woekun.toeiconline.models.SubQuestion;
 import com.example.woekun.toeiconline.models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -202,14 +204,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int updateUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(NAME, user.getName());
-        values.put(PHONE, user.getPhone());
         values.put(AVATAR, user.getAvatar());
-        values.put(ADDRESS, user.getAddress());
-
-
         return db.update(TABLE_USER, values, EMAIL + " = ?",
                 new String[]{user.getEmail()});
+    }
+
+    public String getAvatar(String email){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USER, new String[]{AVATAR},
+                EMAIL + "=?", new String[]{email}, null, null, null, null);
+        String path = null;
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+
+            path = cursor.getString(0);
+            cursor.close();
+        }
+        return path;
     }
 
     public int updateUserLevel(User user) {
@@ -347,7 +358,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return subQuestions;
     }
 
-    public long getSubQuestionSizeOfQuestion(String questionId){
+    public long getSubQuestionSizeOfQuestion(String questionId) {
         return DatabaseUtils.queryNumEntries(
                 this.getReadableDatabase(),
                 TABLE_SUB_QUESTION, QUESTION_ID + "=?",
@@ -408,9 +419,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     *  Table Test Question methods
+     * Table Test Question methods
      */
-    public void addTestQuestion(ArrayList<Question> questions){
+    public void addTestQuestion(ArrayList<Question> questions) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         for (Question question : questions) {
@@ -436,7 +447,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(PART, progress.getPart());
         values.put(SUB_QUESTION_ID, progress.getSubQuestionID());
         values.put(ANSWER_PICKED, progress.getAnswerPicked());
-        values.put(TRUE,progress.getIsTrue());
+        values.put(TRUE, progress.getIsTrue());
 
         db.replace(TABLE_PROGRESS_TEST, null, values);
     }
@@ -456,11 +467,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return progress;
     }
 
-    public long getTrueQuantity() {
+    public HashMap<String,Long> getTrueQuantity(){
+        HashMap<String,Long> trueQuantities = new HashMap<>();
+        for(int i=0;i<7;i++){
+            trueQuantities.put(PART+(i+1),getTrueQuantityByPart(String.valueOf(i+1)));
+        }
+        return trueQuantities;
+    }
+
+    public long getTrueQuantityByPart(String part) {
         return DatabaseUtils.queryNumEntries(
                 this.getReadableDatabase(),
-                TABLE_PROGRESS_TEST, TRUE + "=?",
-                new String[]{"1"});
+                TABLE_PROGRESS_TEST, PART + "=? AND " + TRUE + "=?",
+                new String[]{part,"1"});
     }
 
     public void dropTableTestProgress() {

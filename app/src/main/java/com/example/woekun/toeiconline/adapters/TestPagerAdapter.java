@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.example.woekun.toeiconline.models.Question;
+import com.example.woekun.toeiconline.ui.fragments.SubmitTestFragment;
 import com.example.woekun.toeiconline.ui.fragments.TestItem;
 
 import java.util.ArrayList;
@@ -14,8 +15,9 @@ public class TestPagerAdapter extends FragmentStatePagerAdapter {
     private static TestPagerAdapter testPagerAdapter;
 
     private ArrayList<ArrayList<Question>> allQuestionForTest;
+    private int numberOfPages;
 
-    public static TestPagerAdapter getInstance(){
+    public static TestPagerAdapter getInstance() {
         return testPagerAdapter;
     }
 
@@ -23,19 +25,33 @@ public class TestPagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
         testPagerAdapter = this;
         this.allQuestionForTest = allQuestionForTest;
+        numberOfPages = allQuestionForTest.get(0).size()
+                + allQuestionForTest.get(1).size()
+                + allQuestionForTest.get(2).size()
+                + allQuestionForTest.get(3).size()
+                + allQuestionForTest.get(4).size()
+                + allQuestionForTest.get(5).size()
+                + allQuestionForTest.get(6).size()
+                + 1;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return TestItem.newInstance(position);
+        if (position != numberOfPages)
+            return TestItem.newInstance(position);
+        else
+            return new SubmitTestFragment();
     }
 
     @Override
     public int getCount() {
-        return 200;
+        return numberOfPages;
     }
 
-    public Question getQuestionByPart(int part, int position){
+    public Question getQuestionByPart(int part, int position) {
         return allQuestionForTest.get(part).get(position);
+    }
+    public int getQuestionSize(int part) {
+        return allQuestionForTest.get(part).size();
     }
 }

@@ -19,7 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" >
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            android:title="TEST">
+
             <TextView
                 android:id="@+id/time_limit"
                 android:layout_margin="10dp"
@@ -41,10 +43,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?android:attr/actionBarSize"
-        android:paddingTop="@dimen/appbar_padding_top">
+        android:layout_marginTop="?android:attr/actionBarSize">
 
-        <android.support.v4.view.ViewPager
+        <com.example.woekun.toeiconline.customs.SwipeCustomizableViewPager
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -108,7 +108,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             public void onSuccess(User user) {
 
                 startActivityForResult(new Intent(RegisterActivity.this,
-                        FlashScreen.class), Const.REG_REQUEST);
+                        FlashScreen.class), Const.REQUEST);
                 appController.getDatabaseHelper().addUser(user);
                 appController.getSharedPreferences().edit().putString(Const.EMAIL, email).apply();
                 appController.getSharedPreferences().edit().putString(Const.LEVEL, "1").apply();
@@ -130,8 +130,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         appController = null;
     }
 }

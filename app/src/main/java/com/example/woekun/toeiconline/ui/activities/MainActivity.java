@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.example.woekun.toeiconline.AppController;
 import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.R;
-import com.example.woekun.toeiconline.utils.Utils;
+import com.example.woekun.toeiconline.utils.DialogUtils;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent.putExtra(Const.TYPE, Const.TRAIN);
                     startActivity(intent);
                 } else {
-                    Utils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 2);
+                    DialogUtils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 2);
                 }
                 break;
             case R.id.to700:
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent.putExtra(Const.TYPE, Const.TRAIN);
                     startActivity(intent);
                 } else {
-                    Utils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 3);
+                    DialogUtils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 3);
                 }
                 break;
             case R.id.to900:
@@ -90,21 +90,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent.putExtra(Const.TYPE, Const.TRAIN);
                     startActivity(intent);
                 } else {
-                    Utils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 4);
+                    DialogUtils.dialogTestConfirm(this, "This level does not fit you!! Do you want to test?", 4);
                 }
                 break;
             case R.id.general:
                 Toast.makeText(MainActivity.this, "update latter", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.test:
-                Utils.dialogTestConfirm(this, "Are you sure you want to test?", 4);
+                DialogUtils.dialogTestConfirm(this, "Are you sure you want to test?", 4);
                 break;
         }
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         appController = null;
     }
 }

@@ -1,16 +1,25 @@
 package com.example.woekun.toeiconline;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.example.woekun.toeiconline.customs.CustomRequest;
 import com.example.woekun.toeiconline.models.Question;
 import com.example.woekun.toeiconline.models.SubQuestion;
 import com.example.woekun.toeiconline.models.User;
+import com.example.woekun.toeiconline.ui.activities.MainActivity;
 import com.example.woekun.toeiconline.ui.fragments.QuestionFragment;
+import com.example.woekun.toeiconline.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +27,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 
@@ -26,6 +36,7 @@ public class APIs {
     private static final String ERROR = "error";
     private static final String MESSAGE = "message";
     private static final String FALSE = "false";
+    private static final String IMAGE_NAME = "image_name";
 
     /**
      * get(../v1/questions/level/part)
@@ -58,7 +69,7 @@ public class APIs {
     public static void getQuestions(final String levelId, final DataCallBack dataCallBack) {
 
         final ArrayList<Question> questions = new ArrayList<>();
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, Const.GET_QUESTIONS_URL+levelId,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, Const.GET_QUESTIONS_URL + levelId,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -112,8 +123,10 @@ public class APIs {
 
     public interface DataCallBack {
         void onSuccess(ArrayList<Question> questions);
+
         void onFailed(VolleyError error);
     }
+
 
     public static void login(final String email, final String password, final LoginCallBack loginCallBack) {
         Map<String, String> params = new HashMap<>();
@@ -151,6 +164,7 @@ public class APIs {
 
     public interface LoginCallBack {
         void onSuccess(User user);
+
         void onFailed(String message);
     }
 
@@ -187,6 +201,43 @@ public class APIs {
     }
 
     public interface RegisterCallBack extends LoginCallBack {
+    }
+
+    public static void uploadImage(final Bitmap bitmap, final String email, final String name, final UploadCallback uploadCallback) {
+        final String image = Utils.getStringImage(bitmap);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Const.UPLOAD_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        uploadCallback.onRespone(s);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        uploadCallback.onRespone(volleyError.getMessage());
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new Hashtable<>();
+                params.put(EMAIL, email);
+                params.put(IMAGE_NAME, name);
+                params.put(AVATAR, image);
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return super.getHeaders();
+            }
+
+        };
+        AppController.getInstance().addToRequestQueue(stringRequest);
+    }
+
+    public interface UploadCallback {
+        void onRespone(String message);
     }
 
 }

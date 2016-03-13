@@ -1,6 +1,5 @@
 package com.example.woekun.toeiconline.ui.fragments;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.woekun.toeiconline.R;
+import com.example.woekun.toeiconline.ui.activities.LobbyActivity;
 
 
 public class RankingFragment extends Fragment {
@@ -17,13 +17,13 @@ public class RankingFragment extends Fragment {
     }
 
     public static RankingFragment newInstance() {
-        RankingFragment fragment = new RankingFragment();
-        return fragment;
+        return new RankingFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((LobbyActivity) getActivity()).setTitle("RANKING");
 
     }
 

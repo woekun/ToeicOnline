@@ -25,12 +25,14 @@ import com.example.woekun.toeiconline.adapters.QuestionPagerAdapter;
 import com.example.woekun.toeiconline.models.Progress;
 import com.example.woekun.toeiconline.models.Question;
 import com.example.woekun.toeiconline.models.SubQuestion;
+import com.example.woekun.toeiconline.ui.activities.LobbyActivity;
 import com.example.woekun.toeiconline.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, MediaPlayer.OnPreparedListener {
+public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChangeListener,
+        MediaPlayer.OnPreparedListener, View.OnClickListener {
 
     private AppController appController;
     private DatabaseHelper databaseHelper;
@@ -76,16 +78,18 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
             email = sharedPreferences.getString(Const.EMAIL, null);
 
             questions = databaseHelper.getQuestions(level, String.valueOf(partId));
-            for(Question question: questions){
-                for(SubQuestion subQuestion: question.getSubQuestionList()){
+            for (Question question : questions) {
+                for (SubQuestion subQuestion : question.getSubQuestionList()) {
                     String subQuestionId = String.valueOf(subQuestion.getSubQuestionID());
                     Progress progress = databaseHelper.getProgress(email, subQuestionId);
-                    if(progress!=null)
+                    if (progress != null)
                         subQuestion.setAnswerPicked(progress.getAnswerPicked());
                 }
             }
             mSectionsPagerAdapter = new QuestionPagerAdapter(
                     getActivity().getSupportFragmentManager(), questions);
+
+            ((LobbyActivity) getActivity()).setTitle("PART " + partId);
         }
     }
 
@@ -113,15 +117,7 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
 
             mViewPager.addOnPageChangeListener(mOnPageChangeListener);
             mOnPageChangeListener.onPageSelected(0);
-            playButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!mediaPlayer.isPlaying())
-                        mediaPlayer.start();
-                    else
-                        mediaPlayer.pause();
-                }
-            });
+            playButton.setOnClickListener(this);
             songProgressBar.setOnSeekBarChangeListener(this);
         } else {
             audioLayout.setVisibility(View.GONE);
@@ -161,7 +157,7 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         mHandler.removeCallbacks(mUpdateTimeTask);
-        int currentPosition = Utils.progressToTimer(seekBar.getProgress(), (int)totalDuration);
+        int currentPosition = Utils.progressToTimer(seekBar.getProgress(), (int) totalDuration);
 
         // forward or backward to certain seconds
         mediaPlayer.seekTo(currentPosition);
@@ -173,6 +169,15 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
     @Override
     public void onPrepared(MediaPlayer mp) {
         totalDuration = mp.getDuration();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == playButton)
+            if (!mediaPlayer.isPlaying())
+                mediaPlayer.start();
+            else
+                mediaPlayer.pause();
     }
 
 
@@ -200,7 +205,7 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
 
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
-            if(mediaPlayer!=null) {
+            if (mediaPlayer != null) {
                 long currentDuration = mediaPlayer.getCurrentPosition();
 
                 songProgressText.setText(String.format("%s/%s",
@@ -217,14 +222,21 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
         }
     };
 
-
     @Override
     public void onStop() {
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
         }
         appController = null;
+        super.onDestroy();
     }
 }

@@ -4,10 +4,12 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,24 +17,29 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.woekun.toeiconline.AppController;
 import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.DatabaseHelper;
 import com.example.woekun.toeiconline.R;
 import com.example.woekun.toeiconline.adapters.TestPagerAdapter;
+import com.example.woekun.toeiconline.customs.SwipeCustomizableViewPager;
 import com.example.woekun.toeiconline.models.Question;
+import com.example.woekun.toeiconline.utils.DialogUtils;
 import com.example.woekun.toeiconline.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener, OnCompletionListener {
 
     private AppController appController;
 
     private TestPagerAdapter testPagerAdapter;
-    private ViewPager mViewPager;
+    private SwipeCustomizableViewPager mViewPager;
     private MediaPlayer mediaPlayer;
     private SeekBar songProgressBar;
     private LinearLayout audioLayout;
@@ -41,9 +48,12 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
 
     private onPageChangeListener mOnPageChangeListener = new onPageChangeListener();
     private Handler mHandler = new Handler();
+    private CountDownTimer countDownTimer;
+    private Utils.TimerCallBack timerCallBack;
 
     private ArrayList<ArrayList<Question>> allQuestionForTest;
     private long totalDuration;
+    private long leftTime;
     private int limit = 0;
 
     @Override
@@ -51,6 +61,12 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
+        initView();
+        initAudioController(1);
+        initTimer();
+    }
+
+    private void initView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -65,22 +81,36 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
         }
 
         testPagerAdapter = new TestPagerAdapter(getSupportFragmentManager(), allQuestionForTest);
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (SwipeCustomizableViewPager) findViewById(R.id.container);
+//        mViewPager.setPagingEnabled(false);
         mViewPager.setAdapter(testPagerAdapter);
 
         audioLayout = (LinearLayout) findViewById(R.id.seek_bar_view);
         songProgressBar = (SeekBar) findViewById(R.id.seek_bar);
         songProgressText = (TextView) findViewById(R.id.time_audio);
+    }
 
-        initAudioController(1);
-        Utils.countDownTimer(time_limit);
+    private void initTimer() {
+        timerCallBack = new Utils.TimerCallBack() {
+            @Override
+            public void leftTime(long time) {
+                leftTime = time;
+            }
+
+            @Override
+            public void isFinish(boolean finish) {
+                if (finish) {
+                    mViewPager.setCurrentItem(mViewPager.getAdapter().getCount() - 1);
+                }
+            }
+        };
+        countDownTimer = Utils.countDownTimer(time_limit, this, 7200000, timerCallBack).start();
     }
 
     private void initAudioController(int partId) {
         if (checkPart(String.valueOf(partId))) {
             audioLayout.setVisibility(View.VISIBLE);
             mediaPlayer = new MediaPlayer();
-
 
             mViewPager.addOnPageChangeListener(mOnPageChangeListener);
             if (partId == 1)
@@ -96,9 +126,10 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
 
         DatabaseHelper databaseHelper = appController.getDatabaseHelper();
         for (int i = 1; i < 8; i++) {
-            allQuestionForTest.add(databaseHelper.getQuestionsForTest(level, String.valueOf(i)));
+            ArrayList<Question> tmp = databaseHelper.getQuestionsForTest(level, String.valueOf(i));
+            Collections.shuffle(tmp, new Random());
+            allQuestionForTest.add(tmp);
         }
-
     }
 
     private void setAudio(String audioUri) {
@@ -131,13 +162,7 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (++limit < 2) {
-            songProgressBar.setProgress(0);
-            mp.start();
-        } else {
-            limit = 0;
-            mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
-        }
+        mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
     }
 
     public class onPageChangeListener implements ViewPager.OnPageChangeListener {
@@ -149,14 +174,16 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
 
         @Override
         public void onPageSelected(int position) {
-            if (position < 10) {
+            if (position < allQuestionForTest.get(0).size()) {
                 setAudio(allQuestionForTest.get(0).get(position).getAudio());
-            } else if (position < 40) {
-                setAudio(allQuestionForTest.get(1).get(position - 10).getAudio());
-            } else if (position < 50) {
-                setAudio(allQuestionForTest.get(2).get(position - 10).getAudio());
-            } else if (position < 60) {
-                setAudio(allQuestionForTest.get(3).get(position - 10).getAudio());
+            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size()) {
+                setAudio(allQuestionForTest.get(1).get(position - allQuestionForTest.get(0).size()).getAudio());
+            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size() + allQuestionForTest.get(2).size()) {
+                setAudio(allQuestionForTest.get(2).get(position - allQuestionForTest.get(0).size() - allQuestionForTest.get(1).size()).getAudio());
+            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size() + allQuestionForTest.get(2).size() + allQuestionForTest.get(3).size()) {
+                setAudio(allQuestionForTest.get(3).get(position - allQuestionForTest.get(0).size() - allQuestionForTest.get(1).size() - allQuestionForTest.get(2).size()).getAudio());
+            } else {
+                audioLayout.setVisibility(View.GONE);
             }
         }
 
@@ -189,15 +216,50 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
         }
     };
 
+    @Override
+    public void onBackPressed() {
+        countDownTimer.cancel();
+
+        if (mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
+
+        DialogUtils.dialogStopTestConfirm(this, new DialogUtils.StopTestCallback() {
+            @Override
+            public void onAgree() {
+                if (mediaPlayer != null) {
+                    mediaPlayer.release();
+                    mediaPlayer = null;
+                }
+                appController = null;
+                finish();
+            }
+
+            @Override
+            public void onRefuse() {
+                if (mediaPlayer != null) {
+                    mediaPlayer.start();
+                }
+                countDownTimer = Utils.countDownTimer(time_limit, TestActivity.this, leftTime, timerCallBack).start();
+            }
+        });
+    }
 
     @Override
     public void onStop() {
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
         }
         appController = null;
+        super.onDestroy();
     }
-
 }

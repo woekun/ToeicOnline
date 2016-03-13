@@ -5,6 +5,7 @@
     tools:context="com.example.woekun.toeiconline.ui.fragments.InformationFragment">
 
     <LinearLayout
+        android:layout_margin="16dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -14,11 +15,10 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:layout_weight="1">
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/current_avatar"
                 android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@mipmap/ic_user_male"/>
+                android:layout_height="100dp" />
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -111,8 +111,7 @@
             android:layout_height="wrap_content"
             android:text="Sign Out"
             android:textColor="#ffffff"
-            android:background="@drawable/button_login_normal_background"
-            android:layout_margin="16dp" />
+            android:background="@drawable/button_login_normal_background" />
     </LinearLayout>
 
 

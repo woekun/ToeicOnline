@@ -40,10 +40,12 @@ public class QuestionView extends LinearLayout {
     private LinearLayout subQuestionsView;
     private View card;
 
-    private boolean canCollapse = false;
     private boolean hasParagraph = false;
     private boolean isChecked = false;
+    private int part;
     private String mode = TRAINING;
+    private Question question;
+
 
     public QuestionView(Context context) {
         super(context);
@@ -83,14 +85,16 @@ public class QuestionView extends LinearLayout {
     }
 
     public void setQuestion(Question question) {
-        setParagraph(question);
-        addSubQuestionContent(question);
+        part = question.getPart();
+        this.question = question;
+        setParagraph();
+        addSubQuestionContent();
     }
 
-    private void setParagraph(Question question) {
+    private void setParagraph() {
         TextView paragraph = (TextView) paragraphView.findViewById(R.id.paragraph);
         if (!question.getParagraph().equals("")) {
-            if (question.getPart() == 3 || question.getPart() == 4) {
+            if (part == 3 || part == 4) {
                 paragraph.setVisibility(View.GONE);
             } else {
                 paragraphView.setVisibility(View.VISIBLE);
@@ -115,11 +119,7 @@ public class QuestionView extends LinearLayout {
         }
     }
 
-    public void setCollapse(boolean canCollapse) {
-        this.canCollapse = canCollapse;
-    }
-
-    private void addSubQuestionContent(Question question) {
+    private void addSubQuestionContent() {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         ArrayList<SubQuestion> subQuestions = question.getSubQuestionList();
@@ -129,23 +129,22 @@ public class QuestionView extends LinearLayout {
 
             card = inflater.inflate(R.layout.sub_question_item, null, true);
             setPosition(i);
-            setImageQuestion(question);
-            setAnswerField(subQuestion, question.getPart());
+            setImageQuestion();
+            setAnswerField(subQuestion);
             setContent(subQuestion);
 
             subQuestionsView.addView(card);
         }
     }
 
-    private void setImageQuestion(Question question) {
+    private void setImageQuestion() {
         if (!question.getImage().equals(""))
             Picasso.with(getContext())
                     .load(Const.BASE_IMAGE_URL + question.getImage() + ".jpg")
                     .into((ImageView) card.findViewById(R.id.image_question));
     }
 
-    private void setAnswerField(final SubQuestion subQuestion, final int part) {
-
+    private void setAnswerField(final SubQuestion subQuestion) {
 
         final RadioGroup answerField = (RadioGroup) card.findViewById(R.id.list_answer_radio);
         final ArrayList<String> answerList = subQuestion.getAnswerList();
@@ -153,7 +152,7 @@ public class QuestionView extends LinearLayout {
         for (int i = 0; i < answerList.size(); i++) {
             if (i == 3 && part == 2)
                 answerField.getChildAt(i).setVisibility(View.GONE);
-            else
+            if(part!=1 && part!=2)
                 ((RadioButton) answerField.getChildAt(i)).setText(answerList.get(i));
         }
 
@@ -221,23 +220,10 @@ public class QuestionView extends LinearLayout {
     }
 
     private void setContent(SubQuestion subQuestion) {
-        final View line = card.findViewById(R.id.line);
         final TextView content = (TextView) card.findViewById(R.id.text_question);
-        final RadioGroup answerField = (RadioGroup) card.findViewById(R.id.list_answer_radio);
-        content.setText(subQuestion.getContent());
-        content.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (canCollapse) {
-                    if (answerField.getVisibility() == View.GONE && line.getVisibility() == View.GONE) {
-                        answerField.setVisibility(View.VISIBLE);
-                        line.setVisibility(View.VISIBLE);
-                    } else {
-                        answerField.setVisibility(View.GONE);
-                        line.setVisibility(View.GONE);
-                    }
-                }
-            }
-        });
+        if(part!=2){
+            content.setText(subQuestion.getContent());
+        }else
+            content.setText("Listen to question and choose a correct");
     }
 }

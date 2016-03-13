@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.example.woekun.toeiconline.AppController;
 import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.R;
+import com.example.woekun.toeiconline.ui.activities.LobbyActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -48,8 +49,10 @@ public class AnalyzeFragment extends Fragment implements OnChartGestureListener 
         super.onCreate(savedInstanceState);
         appController = AppController.getInstance();
 
-        email = appController.getSharedPreferences().getString(Const.EMAIL,null);
+        email = appController.getSharedPreferences().getString(Const.EMAIL, null);
         scores = appController.getDatabaseHelper().getScore(email);
+
+        ((LobbyActivity)getActivity()).setTitle("ANALYZE");
     }
 
     @Override

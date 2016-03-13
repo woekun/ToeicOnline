@@ -12,9 +12,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-/**
- * Created by woekun on 23/1/2016.
- */
 public class CustomRequest extends Request<JSONObject> {
 
     private Response.Listener<JSONObject> listener;
@@ -37,7 +34,7 @@ public class CustomRequest extends Request<JSONObject> {
     protected Map<String, String> getParams()
             throws com.android.volley.AuthFailureError {
         return params;
-    };
+    }
 
     @Override
     protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {

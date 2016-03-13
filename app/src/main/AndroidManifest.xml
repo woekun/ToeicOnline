@@ -3,6 +3,7 @@
     package="com.example.woekun.toeiconline">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".AppController"
@@ -37,21 +38,15 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.LobbyActivity"
-            android:label="@string/title_activity_lobby"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.FlashScreen"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service
-            android:name=".services.AudioService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity
             android:name=".ui.activities.TestActivity"
-            android:label="@string/title_activity_activity_test"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="TEST"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package com.example.woekun.toeiconline.ui.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import com.example.woekun.toeiconline.R;
 import com.example.woekun.toeiconline.customs.RecyclerItemClickListener;
 import com.example.woekun.toeiconline.adapters.PartListAdapter;
+import com.example.woekun.toeiconline.ui.activities.LobbyActivity;
 
 public class ListPartFragment extends Fragment {
 
@@ -19,22 +21,26 @@ public class ListPartFragment extends Fragment {
     }
 
     public static ListPartFragment newInstance() {
-        ListPartFragment fragment = new ListPartFragment();
-        return fragment;
+        return new ListPartFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        ((LobbyActivity)getActivity()).setTitle("TRAINING");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list_part, container, false);
+        return inflater.inflate(R.layout.fragment_list_part, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle("Training");
         initRecyclerView(view);
-        return view;
     }
 
     private void initRecyclerView(View view){

@@ -1,9 +1,8 @@
 package com.example.woekun.toeiconline.ui.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
@@ -12,8 +11,7 @@ import com.example.woekun.toeiconline.AppController;
 import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.R;
 import com.example.woekun.toeiconline.models.Question;
-import com.example.woekun.toeiconline.models.SubQuestion;
-import com.example.woekun.toeiconline.utils.Utils;
+import com.example.woekun.toeiconline.utils.DialogUtils;
 
 import java.util.ArrayList;
 
@@ -30,7 +28,7 @@ public class FlashScreen extends AppCompatActivity {
         String level = appController.getSharedPreferences().getString(Const.LEVEL, null);
         if (level != null) {
             if (Integer.valueOf(level) == 1) {
-                Utils.dialogTestConfirm(this, "First, you need to take a Test", 1);
+                DialogUtils.dialogTestConfirm(this, "First, you need to take a Test", 1);
             } else
                 loadData(level);
         }
@@ -41,7 +39,8 @@ public class FlashScreen extends AppCompatActivity {
             @Override
             public void onSuccess(ArrayList<Question> questions) {
                 appController.getDatabaseHelper().addQuestion(questions);
-                startActivityForResult(new Intent(FlashScreen.this, MainActivity.class), Const.REG_REQUEST);
+                startActivity(new Intent(FlashScreen.this, MainActivity.class));
+                finish();
             }
 
             @Override
@@ -53,8 +52,8 @@ public class FlashScreen extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
         appController = null;
+        super.onDestroy();
     }
 }

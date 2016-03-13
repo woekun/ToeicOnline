@@ -7,13 +7,15 @@ public class Const {
     public static final String REGISTER_URL = BASE_URL + "/v1/register";
     public static final String LOGIN_URL = BASE_URL + "/v1/login";
     public static final String GET_QUESTIONS_URL = BASE_URL + "/v1/questions/";
+    public static final String UPLOAD_URL = BASE_URL + "/v1/avatar";
 
     // Resource URL
-    public static final String BASE_IMAGE_URL = BASE_URL + "/asset/image/";
+    public static final String BASE_IMAGE_URL = BASE_URL + "/asset/image/image_part1/";
     public static final String BASE_AUDIO_URL = BASE_URL + "/asset/audio/";
 
     // Common values
-    public static final int REG_REQUEST = 1;
+    public static final int REQUEST = 1;
+    public static final int PICK_IMAGE_REQUEST = 2;
     public static final String EMAIL = "email";
     public static final String TYPE = "type";
     public static final String INFO = "info";
