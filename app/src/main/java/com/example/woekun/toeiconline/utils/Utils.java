@@ -1,49 +1,32 @@
 package com.example.woekun.toeiconline.utils;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.util.Base64;
-import android.util.Log;
 import android.util.TypedValue;
-import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.os.Handler;
 
-import com.example.woekun.toeiconline.AppController;
-import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.R;
-import com.example.woekun.toeiconline.ui.activities.TestActivity;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 
 public class Utils {
 
-    public static CountDownTimer countDownTimer(final TextView view, final Context context,long startTime, final TimerCallBack timerCallBack) {
+    public static CountDownTimer countDownTimer(final TextView view, final Context context, long startTime, final TimerCallBack timerCallBack) {
         return new CountDownTimer(startTime, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                if (millisUntilFinished <= 60000){
+                if (millisUntilFinished <= 60000) {
                     view.setBackground(ContextCompat.getDrawable(context, R.drawable.red_background));
                     view.setTextColor(Color.WHITE);
                     view.setCompoundDrawablesWithIntrinsicBounds(
-                            ContextCompat.getDrawable(context, R.drawable.ic_query_builder_white_24dp),null,null,null);
+                            ContextCompat.getDrawable(context, R.drawable.ic_query_builder_white_24dp), null, null, null);
                 }
 
                 String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
@@ -59,11 +42,6 @@ public class Utils {
                 timerCallBack.isFinish(true);
             }
         };
-    }
-
-    public interface TimerCallBack{
-        void leftTime(long time);
-        void isFinish(boolean finish);
     }
 
     public static int getPixelValue(Context context, int dimenId) {
@@ -103,9 +81,9 @@ public class Utils {
         return currentDuration * 1000;
     }
 
-    public static String getStringImage(Bitmap bmp){
+    public static String getStringImage(Bitmap bmp) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
 
@@ -117,5 +95,11 @@ public class Utils {
     public static boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 0;
+    }
+
+    public interface TimerCallBack {
+        void leftTime(long time);
+
+        void isFinish(boolean finish);
     }
 }

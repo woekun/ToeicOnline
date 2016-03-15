@@ -1,10 +1,6 @@
 package com.example.woekun.toeiconline.ui.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -19,14 +15,11 @@ import android.widget.Toast;
 import com.example.woekun.toeiconline.APIs;
 import com.example.woekun.toeiconline.AppController;
 import com.example.woekun.toeiconline.Const;
-import com.example.woekun.toeiconline.DatabaseHelper;
 import com.example.woekun.toeiconline.R;
 import com.example.woekun.toeiconline.models.User;
 import com.example.woekun.toeiconline.utils.Utils;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
-
-    public final String TAG = RegisterActivity.class.getSimpleName();
 
     // UI references.
     private EditText mEmailView;
@@ -65,7 +58,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
         final String email = mEmailView.getText().toString();
         final String password = mPasswordView.getText().toString();
 
@@ -91,27 +83,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-
-            Register(email,password);
+            Register(email, password);
         }
     }
 
-    private void Register(final String email, String password){
+    private void Register(final String email, String password) {
         APIs.register(email, password, new APIs.RegisterCallBack() {
             @Override
             public void onSuccess(User user) {
-
                 startActivityForResult(new Intent(RegisterActivity.this,
                         FlashScreen.class), Const.REQUEST);
+                appController.setCurrentUser(user);
                 appController.getDatabaseHelper().addUser(user);
-                appController.getSharedPreferences().edit().putString(Const.EMAIL, email).apply();
-                appController.getSharedPreferences().edit().putString(Const.LEVEL, "1").apply();
                 finish();
             }
 
@@ -130,8 +115,21 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Const.REQUEST && resultCode == RESULT_OK)
+            finish();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         appController = null;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
     }
 }

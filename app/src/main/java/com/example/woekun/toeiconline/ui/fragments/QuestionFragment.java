@@ -1,11 +1,9 @@
 package com.example.woekun.toeiconline.ui.fragments;
 
-import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -13,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -25,6 +22,7 @@ import com.example.woekun.toeiconline.adapters.QuestionPagerAdapter;
 import com.example.woekun.toeiconline.models.Progress;
 import com.example.woekun.toeiconline.models.Question;
 import com.example.woekun.toeiconline.models.SubQuestion;
+import com.example.woekun.toeiconline.models.User;
 import com.example.woekun.toeiconline.ui.activities.LobbyActivity;
 import com.example.woekun.toeiconline.utils.Utils;
 
@@ -36,10 +34,10 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
 
     private AppController appController;
     private DatabaseHelper databaseHelper;
-    private SharedPreferences sharedPreferences;
     private QuestionPagerAdapter mSectionsPagerAdapter;
     private Handler mHandler = new Handler();
 
+    private User currentUser;
     private String partId;
     private String level;
     private String email;
@@ -52,6 +50,24 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
     private ImageButton playButton;
     private TextView songProgressText;
     private onPageChangeListener mOnPageChangeListener = new onPageChangeListener();
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            if (mediaPlayer != null) {
+                long currentDuration = mediaPlayer.getCurrentPosition();
+
+                songProgressText.setText(String.format("%s/%s",
+                        Utils.milliSecondsToTimer(currentDuration),
+                        Utils.milliSecondsToTimer(totalDuration)));
+
+                // Updating progress bar
+                int progress = (Utils.getProgressPercentage(currentDuration, totalDuration));
+                songProgressBar.setProgress(progress);
+
+                // Running this thread after 100 milliseconds
+                mHandler.postDelayed(this, 100);
+            }
+        }
+    };
 
     public QuestionFragment() {
         // Required empty public constructor
@@ -69,13 +85,13 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         appController = AppController.getInstance();
-        sharedPreferences = appController.getSharedPreferences();
         databaseHelper = appController.getDatabaseHelper();
+        currentUser = appController.getCurrentUser();
 
         if (getArguments() != null) {
             partId = String.valueOf(getArguments().getInt("part"));
-            level = sharedPreferences.getString(Const.LEVEL, "1");
-            email = sharedPreferences.getString(Const.EMAIL, null);
+            level = currentUser.getLevel();
+            email = currentUser.getEmail();
 
             questions = databaseHelper.getQuestions(level, String.valueOf(partId));
             for (Question question : questions) {
@@ -174,53 +190,18 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
     @Override
     public void onClick(View v) {
         if (v == playButton)
-            if (!mediaPlayer.isPlaying())
+            if (!mediaPlayer.isPlaying()) {
                 mediaPlayer.start();
-            else
+                playButton.setImageResource(R.drawable.ic_pause_circle_fill_24dp);
+            } else {
                 mediaPlayer.pause();
-    }
-
-
-    public class onPageChangeListener implements ViewPager.OnPageChangeListener {
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            setAudio(questions.get(position).getAudio());
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
+                playButton.setImageResource(R.drawable.ic_play_circle_fill_24dp);
+            }
     }
 
     private void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }
-
-    private Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {
-            if (mediaPlayer != null) {
-                long currentDuration = mediaPlayer.getCurrentPosition();
-
-                songProgressText.setText(String.format("%s/%s",
-                        Utils.milliSecondsToTimer(currentDuration),
-                        Utils.milliSecondsToTimer(totalDuration)));
-
-                // Updating progress bar
-                int progress = (Utils.getProgressPercentage(currentDuration, totalDuration));
-                songProgressBar.setProgress(progress);
-
-                // Running this thread after 100 milliseconds
-                mHandler.postDelayed(this, 100);
-            }
-        }
-    };
 
     @Override
     public void onStop() {
@@ -238,5 +219,23 @@ public class QuestionFragment extends Fragment implements SeekBar.OnSeekBarChang
         }
         appController = null;
         super.onDestroy();
+    }
+
+    public class onPageChangeListener implements ViewPager.OnPageChangeListener {
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            setAudio(questions.get(position).getAudio());
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
     }
 }

@@ -12,8 +12,6 @@ import com.example.woekun.toeiconline.adapters.QuestionPagerAdapter;
 import com.example.woekun.toeiconline.customs.QuestionView;
 import com.example.woekun.toeiconline.models.Question;
 
-import java.util.ArrayList;
-
 
 public class QuestionItem extends Fragment {
     private int position;

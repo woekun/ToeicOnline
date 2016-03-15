@@ -1,118 +1,95 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_teal"
     tools:context="com.example.woekun.toeiconline.ui.fragments.InformationFragment">
 
-    <LinearLayout
-        android:layout_margin="16dp"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:layout_weight="1">
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/current_avatar"
-                android:layout_width="100dp"
-                android:layout_height="100dp" />
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/current_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="20sp" />
-                <EditText
-                    android:id="@+id/change_current_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="20sp"
-                    android:visibility="gone"/>
-            </FrameLayout>
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/current_email"
+            <include layout="@layout/base_info_layout" />
+
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:textColor="@color/colorPrimary"
-                android:textSize="16sp" />
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="4dp">
 
-            <LinearLayout
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/current_phone"
+                        style="@style/textInfoDispaly"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_phone" />
+
+                    <EditText
+                        android:id="@+id/change_current_phone"
+                        style="@style/textInfoDispaly"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_phone"
+                        android:inputType="phone"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_horizontal">
-                <ImageView
-                    android:padding="10dp"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/ic_facbook"/>
-                <ImageView
-                    android:padding="10dp"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/ic_google"/>
-            </LinearLayout>
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/current_phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="16dp"
-                    android:drawableLeft="@drawable/ic_phone"
-                    android:padding="16dp" />
-                <EditText
-                    android:id="@+id/change_current_phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="16dp"
-                    android:inputType="phone"
-                    android:drawableLeft="@drawable/ic_phone"
-                    android:padding="16dp"
-                    android:visibility="gone"/>
-            </FrameLayout>
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="4dp">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/current_address"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="16dp"
-                    android:drawableLeft="@drawable/ic_location_on"
-                    android:padding="16dp"/>
-                <EditText
-                    android:id="@+id/change_current_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="16dp"
-                    android:drawableLeft="@drawable/ic_location_on"
-                    android:padding="16dp"
-                    android:visibility="gone"/>
-            </FrameLayout>
+                    android:layout_height="wrap_content">
 
+                    <TextView
+                        android:id="@+id/current_address"
+                        style="@style/textInfoDispaly"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_location_on"
+                        android:textColor="@color/colorPrimaryDark" />
+
+                    <EditText
+                        android:id="@+id/change_current_address"
+                        style="@style/textInfoDispaly"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_location_on"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </android.support.v7.widget.CardView>
+
+            <include layout="@layout/info_analyze_layout" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
         </LinearLayout>
-        <Button
-            android:id="@+id/btn_logout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sign Out"
-            android:textColor="#ffffff"
-            android:background="@drawable/button_login_normal_background" />
-    </LinearLayout>
+    </ScrollView>
 
-
-</FrameLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_logout" />
+</android.support.design.widget.CoordinatorLayout>

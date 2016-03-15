@@ -1,112 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     android:fitsSystemWindows="true"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/colorPrimary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.woekun.toeiconline.ui.activities.MainActivity">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/logo_transparent" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="General"
-                android:padding="16dp"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:textColor="#ffffff"/>
-            <ImageView
-                android:id="@+id/general"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@mipmap/ic_general"/>
 
-            <TextView
-                android:padding="16dp"
+            <ImageView
+                android:id="@+id/practice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Toeic Training"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:textColor="#ffffff"/>
+                android:adjustViewBounds="true"
+                android:padding="8dp"
+                android:src="@drawable/home_practice_res" />
 
             <ImageView
                 android:id="@+id/to500"
-                android:padding="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher"/>
-            <LinearLayout
-                android:paddingTop="50dp"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <ImageView
-                    android:id="@+id/to700"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:src="@mipmap/ic_launcher"/>
-                <ImageView
-                    android:id="@+id/to900"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:src="@mipmap/ic_launcher"/>
-            </LinearLayout>
-            <TextView
-                android:paddingTop="30dp"
-                android:paddingBottom="16dp"
-                android:layout_width="match_parent"
+                android:layout_marginLeft="30dp"
+                android:adjustViewBounds="true"
+                android:padding="4dp"
+                android:src="@drawable/home_500_res"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/to700"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Toeic Test"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:textColor="#ffffff"/>
+                android:layout_marginLeft="50dp"
+                android:adjustViewBounds="true"
+                android:padding="4dp"
+                android:src="@drawable/home_700_res"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/to900"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:adjustViewBounds="true"
+                android:padding="4dp"
+                android:src="@drawable/home_900_res"
+                android:visibility="gone" />
+
             <ImageView
                 android:id="@+id/test"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher"/>
-            <TextView
-                android:id="@+id/your_rank"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="YOUR RANK"
-                android:textSize="13sp"
-                android:textColor="#ffffff"/>
+                android:adjustViewBounds="true"
+                android:padding="8dp"
+                android:src="@drawable/home_realtest_res" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/your_rank"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="YOUR RANK"
+            android:textColor="#ffffff"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_margin="@dimen/fab_margin"
+            android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/fab_margin"
             android:src="@drawable/ic_timer_auto_24dp" />
     </FrameLayout>
 

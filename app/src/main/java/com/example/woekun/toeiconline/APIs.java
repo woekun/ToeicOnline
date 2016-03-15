@@ -1,24 +1,17 @@
 package com.example.woekun.toeiconline;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.util.Log;
+import android.graphics.BitmapFactory;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.example.woekun.toeiconline.customs.CustomRequest;
 import com.example.woekun.toeiconline.models.Question;
 import com.example.woekun.toeiconline.models.SubQuestion;
 import com.example.woekun.toeiconline.models.User;
-import com.example.woekun.toeiconline.ui.activities.MainActivity;
-import com.example.woekun.toeiconline.ui.fragments.QuestionFragment;
 import com.example.woekun.toeiconline.utils.Utils;
 
 import org.json.JSONArray;
@@ -29,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Random;
 
 
 public class APIs {
@@ -64,6 +58,8 @@ public class APIs {
     private static final String AVATAR = "avatar";
     private static final String LEVEL = "level";
     private static final String NAME = "name";
+    private static final String ADDRESS = "address";
+    private static final String PHONE = "phone";
 
 
     public static void getQuestions(final String levelId, final DataCallBack dataCallBack) {
@@ -121,13 +117,6 @@ public class APIs {
         AppController.getInstance().addToRequestQueue(request);
     }
 
-    public interface DataCallBack {
-        void onSuccess(ArrayList<Question> questions);
-
-        void onFailed(VolleyError error);
-    }
-
-
     public static void login(final String email, final String password, final LoginCallBack loginCallBack) {
         Map<String, String> params = new HashMap<>();
         params.put(EMAIL, email);
@@ -141,8 +130,10 @@ public class APIs {
                             String error = response.getString(ERROR);
                             if (error.equals(FALSE)) {
                                 User user = new User(email, response.getString(NAME),
-                                        password, response.getString(AVATAR),
-                                        response.getString(LEVEL), null, null);
+                                        response.getString(AVATAR),
+                                        response.getString(LEVEL),
+                                        response.getString(ADDRESS),
+                                        response.getString(PHONE));
                                 loginCallBack.onSuccess(user);
 
                             } else
@@ -161,13 +152,6 @@ public class APIs {
                 });
         AppController.getInstance().addToRequestQueue(stringRequest);
     }
-
-    public interface LoginCallBack {
-        void onSuccess(User user);
-
-        void onFailed(String message);
-    }
-
 
     public static void register(final String email, String password, final RegisterCallBack registerCallBack) {
         Map<String, String> params = new HashMap<>();
@@ -200,44 +184,84 @@ public class APIs {
         AppController.getInstance().addToRequestQueue(stringRequest);
     }
 
-    public interface RegisterCallBack extends LoginCallBack {
-    }
+    public static void uploadImage(final String filePath, final String email, final UploadCallback uploadCallback) {
+        final String image = Utils.getStringImage(BitmapFactory.decodeFile(filePath));
+        final String subNameImage = "_avatar_" + new Random().nextInt();
 
-    public static void uploadImage(final Bitmap bitmap, final String email, final String name, final UploadCallback uploadCallback) {
-        final String image = Utils.getStringImage(bitmap);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Const.UPLOAD_URL,
-                new Response.Listener<String>() {
+        Map<String, String> params = new Hashtable<>();
+        params.put(EMAIL, email);
+        params.put(IMAGE_NAME, email + subNameImage);
+        params.put(IMAGE, image);
+
+        CustomRequest stringRequest = new CustomRequest(Request.Method.POST, Const.UPLOAD_URL, params,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String s) {
-                        uploadCallback.onRespone(s);
+                    public void onResponse(JSONObject response) {
+                        try {
+                            uploadCallback.onSuccess(response.getString("notify"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        uploadCallback.getImageLink(Const.BASE_AVATAR_URL + email + subNameImage + ".png");
+
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        uploadCallback.onRespone(volleyError.getMessage());
                     }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new Hashtable<>();
-                params.put(EMAIL, email);
-                params.put(IMAGE_NAME, name);
-                params.put(AVATAR, image);
-                return params;
-            }
+                });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return super.getHeaders();
-            }
-
-        };
         AppController.getInstance().addToRequestQueue(stringRequest);
     }
 
-    public interface UploadCallback {
-        void onRespone(String message);
+
+    public static void updateUser(final Context context, final User user) {
+        Map<String, String> params = new Hashtable<>();
+        params.put(EMAIL, user.getEmail());
+        params.put(NAME, user.getName());
+        params.put(LEVEL, user.getLevel());
+        params.put(ADDRESS, user.getAddress());
+        params.put(PHONE, user.getPhone());
+
+        CustomRequest stringRequest = new CustomRequest(Request.Method.POST, Const.UPDATE_USER, params,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject s) {
+                        Toast.makeText(context, s.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                });
+        AppController.getInstance().addToRequestQueue(stringRequest);
     }
+
+    public interface DataCallBack {
+        void onSuccess(ArrayList<Question> questions);
+
+        void onFailed(VolleyError error);
+    }
+
+    public interface LoginCallBack {
+        void onSuccess(User user);
+
+        void onFailed(String message);
+    }
+
+    public interface UploadCallback {
+        void onSuccess(String message);
+
+        void getImageLink(String link);
+
+    }
+
+    public interface RegisterCallBack extends LoginCallBack {
+    }
+
+
 
 }

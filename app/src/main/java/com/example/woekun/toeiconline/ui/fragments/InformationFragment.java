@@ -1,21 +1,20 @@
 package com.example.woekun.toeiconline.ui.fragments;
 
 import android.app.Activity;
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,13 +22,11 @@ import android.widget.Toast;
 import com.example.woekun.toeiconline.APIs;
 import com.example.woekun.toeiconline.AppController;
 import com.example.woekun.toeiconline.Const;
-import com.example.woekun.toeiconline.DatabaseHelper;
 import com.example.woekun.toeiconline.R;
 import com.example.woekun.toeiconline.models.User;
 import com.example.woekun.toeiconline.ui.activities.LobbyActivity;
 import com.example.woekun.toeiconline.ui.activities.LoginActivity;
-
-import java.io.IOException;
+import com.example.woekun.toeiconline.utils.DialogUtils;
 
 
 public class InformationFragment extends Fragment implements View.OnClickListener {
@@ -37,8 +34,6 @@ public class InformationFragment extends Fragment implements View.OnClickListene
     private AppController appController;
 
     private User currentUser;
-    private Bitmap bitmap;
-    private String mEmail;
     private String filePath;
 
     private ImageView avatar;
@@ -48,6 +43,9 @@ public class InformationFragment extends Fragment implements View.OnClickListene
     private EditText changeName;
     private EditText changePhone;
     private EditText changeAddress;
+    private ImageButton editInfo;
+    private ImageButton editDone;
+    private ProgressDialog progressDialog;
 
     public InformationFragment() {
         // Required empty public constructor
@@ -61,12 +59,8 @@ public class InformationFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         appController = AppController.getInstance();
-        mEmail = appController.getSharedPreferences().getString("email", null);
-        if(mEmail!=null) {
-            currentUser = appController.getDatabaseHelper().getUser(mEmail);
-        }
-        ((LobbyActivity)getActivity()).setTitle("INFORMATION");
-
+        currentUser = appController.getCurrentUser();
+        ((LobbyActivity) getActivity()).setTitle("INFORMATION");
     }
 
     @Override
@@ -78,72 +72,117 @@ public class InformationFragment extends Fragment implements View.OnClickListene
     @Override
     public void onViewCreated(View v, Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
-        Button btn_logOut = (Button)v.findViewById(R.id.btn_logout);
+        initView(v);
+    }
+
+    private void initView(View v) {
+        FloatingActionButton btn_logOut = (FloatingActionButton) v.findViewById(R.id.btn_logout);
         btn_logOut.setOnClickListener(this);
 
-        TextView email =(TextView) v.findViewById(R.id.current_email);
+        TextView email = (TextView) v.findViewById(R.id.current_email);
         email.setText(currentUser.getEmail());
 
         name = (TextView) v.findViewById(R.id.current_name);
-        if(currentUser.getName()!=null)
+        if (currentUser.getName() != null)
             name.setText(currentUser.getName());
 
         phone = (TextView) v.findViewById(R.id.current_phone);
-        if(currentUser.getPhone()!=null)
+        if (currentUser.getPhone() != null)
             phone.setText(currentUser.getPhone());
 
         address = (TextView) v.findViewById(R.id.current_address);
-        if(currentUser.getAddress()!=null)
+        if (currentUser.getAddress() != null)
             address.setText(currentUser.getAddress());
 
         changeName = (EditText) v.findViewById(R.id.change_current_name);
-        changePhone = (EditText)v.findViewById(R.id.change_current_phone);
+        changePhone = (EditText) v.findViewById(R.id.change_current_phone);
         changeAddress = (EditText) v.findViewById(R.id.change_current_address);
-        avatar = (ImageView)v.findViewById(R.id.current_avatar);
+
+        avatar = (ImageView) v.findViewById(R.id.current_avatar);
         avatar.setOnClickListener(this);
 
-        filePath = appController.getDatabaseHelper().getAvatar(mEmail);
-        if(!filePath.equals("")){
-            avatar.setImageBitmap(BitmapFactory.decodeFile(filePath));
+        filePath = currentUser.getAvatar();
+        if (filePath != null && !filePath.equals("")) {
+            appController.getPicasso().load(filePath).placeholder(R.mipmap.ic_user_male).into(avatar);
+        } else {
+            avatar.setImageResource(R.mipmap.ic_user_male);
         }
+
+        editInfo = (ImageButton) v.findViewById(R.id.edit_info);
+        editInfo.setOnClickListener(this);
+        editDone = (ImageButton) v.findViewById(R.id.edit_done);
+        editDone.setOnClickListener(this);
+
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.analyze_container, AnalyzeFragment.newInstance()).commit();
     }
 
     private void showFileChooser() {
         Intent i = new Intent(
                 Intent.ACTION_PICK,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
         startActivityForResult(i, Const.PICK_IMAGE_REQUEST);
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_logout:
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_SINGLE_TOP
                         | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                break;
-            case R.id.current_name:
-                name.setVisibility(View.GONE);
-                changeName.setVisibility(View.VISIBLE);
-                break;
-            case R.id.current_phone:
-                phone.setVisibility(View.GONE);
-                changePhone.setVisibility(View.VISIBLE);
-                break;
-            case R.id.current_address:
-                address.setVisibility(View.GONE);
-                changeAddress.setVisibility(View.VISIBLE);
+                appController.getSharedPreferences().edit().clear().apply();
                 break;
             case R.id.current_avatar:
                 showFileChooser();
                 break;
-            default: break;
-        }
+            case R.id.edit_info:
+                name.setVisibility(View.GONE);
+                changeName.setVisibility(View.VISIBLE);
+                phone.setVisibility(View.GONE);
+                changePhone.setVisibility(View.VISIBLE);
+                address.setVisibility(View.GONE);
+                changeAddress.setVisibility(View.VISIBLE);
+                editDone.setVisibility(View.VISIBLE);
+                editInfo.setVisibility(View.GONE);
+                break;
+            case R.id.edit_done:
+                String addressChange = changeAddress.getText().toString().trim();
+                String nameChange = changeName.getText().toString().trim();
+                String phoneChange = changePhone.getText().toString().trim();
 
+                if (!addressChange.equals("") || !nameChange.equals("") || !phoneChange.equals("")) {
+                    if (!addressChange.equals(""))
+                        currentUser.setAddress(addressChange);
+                    if (!nameChange.equals(""))
+                        currentUser.setName(nameChange);
+                    if (!phoneChange.equals(""))
+                        currentUser.setPhone(phoneChange);
+
+                    APIs.updateUser(appController, currentUser);
+                }
+
+                name.setVisibility(View.VISIBLE);
+                name.setText(currentUser.getName());
+
+                phone.setVisibility(View.VISIBLE);
+                phone.setText(currentUser.getPhone());
+
+                address.setVisibility(View.VISIBLE);
+                address.setText(currentUser.getAddress());
+
+                editInfo.setVisibility(View.VISIBLE);
+
+                editDone.setVisibility(View.GONE);
+                changeName.setVisibility(View.GONE);
+                changePhone.setVisibility(View.GONE);
+                changeAddress.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -160,21 +199,26 @@ public class InformationFragment extends Fragment implements View.OnClickListene
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
             Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            if(cursor!=null){
+            if (cursor != null) {
                 cursor.moveToFirst();
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 filePath = cursor.getString(columnIndex);
                 cursor.close();
 
-                currentUser.setAvatar(filePath);
-                appController.getDatabaseHelper().updateUser(currentUser);
-                bitmap = BitmapFactory.decodeFile(filePath);
-                avatar.setImageBitmap(bitmap);
+                progressDialog = DialogUtils.dialogUploadImage(getContext());
 
-                APIs.uploadImage(bitmap, currentUser.getEmail(), currentUser.getEmail() + "_avatar", new APIs.UploadCallback() {
+                APIs.uploadImage(filePath, currentUser.getEmail(), new APIs.UploadCallback() {
                     @Override
-                    public void onRespone(String message) {
+                    public void onSuccess(String message) {
+                        progressDialog.dismiss();
                         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void getImageLink(String link) {
+                        currentUser.setAvatar(link);
+                        appController.getPicasso().load(link).into(avatar);
+                        appController.getDatabaseHelper().updateUser(currentUser);
                     }
                 });
             }

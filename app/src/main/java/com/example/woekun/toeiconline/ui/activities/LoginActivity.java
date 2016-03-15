@@ -1,13 +1,10 @@
 package com.example.woekun.toeiconline.ui.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -16,6 +13,8 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,13 +28,17 @@ import com.example.woekun.toeiconline.utils.Utils;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -43,6 +46,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button mEmailSignInButton, btnGG;
     private LoginButton loginFb;
     private Animation animation;
+    private CheckBox saveLoginState;
+    private boolean isSaveState;
 
     private CallbackManager callbackManager;
     private AppController appController;
@@ -54,6 +59,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         appController = AppController.getInstance();
 
+        String email = appController.getSharedPreferences().getString(Const.EMAIL, null);
+        if (email != null) {
+            appController.setCurrentUser(appController.getDatabaseHelper().getUser(email));
+            startActivity(new Intent(LoginActivity.this, FlashScreen.class));
+        }
+
         // Set up the login form.
         initView();
         populateAutoComplete();
@@ -63,7 +74,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
 
-        if(mEmailView.getText()!=null || mPasswordView.getText()!=null){
+        if (mEmailView.getText() != null || mPasswordView.getText() != null) {
             mEmailView.setText("");
             mPasswordView.setText("");
         }
@@ -89,7 +100,37 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginFb.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(
+                                    JSONObject object,
+                                    GraphResponse response) {
 
+                                Log.e("response: ", response + "");
+                                try {
+                                    User user = new User();
+                                    user.setEmail(object.getString("email"));
+                                    user.setName(object.getString("name"));
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                                Intent intent = new Intent(LoginActivity.this, FlashScreen.class);
+                                startActivity(intent);
+
+                                finish();
+
+                            }
+
+                        });
+
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender, birthday");
+                request.setParameters(parameters);
+                request.executeAsync();
             }
 
             @Override
@@ -99,12 +140,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onError(FacebookException error) {
-
+                Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
         btnGG = (Button) findViewById(R.id.btn_google);
         animation = AnimationUtils.loadAnimation(this, R.anim.button_translate);
+
+        saveLoginState = (CheckBox) findViewById(R.id.save_state);
+        saveLoginState.setOnCheckedChangeListener(this);
     }
 
     @Override
@@ -118,10 +162,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         if (v == mEmailSignInButton) {
-            String email = mEmailView.getText().toString();
-            String password = mPasswordView.getText().toString();
-            Login(email,password);
+            attemptLogin();
         }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        isSaveState = isChecked;
     }
 
     private void populateAutoComplete() {
@@ -135,10 +182,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     public void signUp(View v) {
         startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+        finish();
     }
 
     private void attemptLogin() {
-
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -172,7 +219,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             focusView.requestFocus();
         } else {
             Login(email, password);
-
         }
     }
 
@@ -181,12 +227,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onSuccess(User user) {
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                if(appController.getDatabaseHelper().getUser(email)==null){
+                if (appController.getDatabaseHelper().getUser(email) == null) {
                     appController.getDatabaseHelper().addUser(user);
                 }
-                appController.getSharedPreferences().edit().putString(Const.EMAIL, email).apply();
-                appController.getSharedPreferences().edit().putString(Const.LEVEL, user.getLevel()).apply();
+                if (isSaveState)
+                    appController.getSharedPreferences().edit().putString(Const.EMAIL, email).apply();
+
+                appController.setCurrentUser(user);
                 startActivity(new Intent(LoginActivity.this, FlashScreen.class));
+                finish();
             }
 
             @Override
@@ -209,5 +258,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         appController = null;
         super.onDestroy();
     }
+
 }
 

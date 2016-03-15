@@ -1,6 +1,5 @@
 package com.example.woekun.toeiconline.adapters;
 
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +9,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.woekun.toeiconline.AppController;
-import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.DatabaseHelper;
 import com.example.woekun.toeiconline.R;
 import com.example.woekun.toeiconline.models.Part;
+import com.example.woekun.toeiconline.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +40,9 @@ public class PartListAdapter extends RecyclerView.Adapter<PartListAdapter.ViewHo
     public PartListAdapter() {
         super();
         DatabaseHelper databaseHelper = appController.getDatabaseHelper();
-        SharedPreferences sharedPreferences = appController.getSharedPreferences();
-        String email = sharedPreferences.getString(Const.EMAIL, null);
-        String level = sharedPreferences.getString(Const.LEVEL, "1");
+        User currentUser = appController.getCurrentUser();
+        String email = currentUser.getEmail();
+        String level = currentUser.getLevel();
 
         partList = new ArrayList<>();
         for (int i = 0; i < imgRes.length; i++) {

@@ -43,4 +43,8 @@
     <string name="title_activity_flash">FlashActivity</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="title_activity_activity_test">ActivityTest</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="keep_signed">Keep me signed in</string>
+    <string name="sign_in_with_gg">Sign in with Google</string>
+    <string name="sign_up_if_needed">Don\'t have an account? Sign up here</string>
 </resources>

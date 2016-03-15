@@ -17,10 +17,6 @@ public class TestPagerAdapter extends FragmentStatePagerAdapter {
     private ArrayList<ArrayList<Question>> allQuestionForTest;
     private int numberOfPages;
 
-    public static TestPagerAdapter getInstance() {
-        return testPagerAdapter;
-    }
-
     public TestPagerAdapter(FragmentManager fm, ArrayList<ArrayList<Question>> allQuestionForTest) {
         super(fm);
         testPagerAdapter = this;
@@ -33,6 +29,10 @@ public class TestPagerAdapter extends FragmentStatePagerAdapter {
                 + allQuestionForTest.get(5).size()
                 + allQuestionForTest.get(6).size()
                 + 1;
+    }
+
+    public static TestPagerAdapter getInstance() {
+        return testPagerAdapter;
     }
 
     @Override
@@ -51,6 +51,7 @@ public class TestPagerAdapter extends FragmentStatePagerAdapter {
     public Question getQuestionByPart(int part, int position) {
         return allQuestionForTest.get(part).get(position);
     }
+
     public int getQuestionSize(int part) {
         return allQuestionForTest.get(part).size();
     }

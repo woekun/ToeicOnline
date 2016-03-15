@@ -8,7 +8,7 @@ public class Part {
     private int progress;
     private int numberQuestion;
 
-    public Part(int partResIdImage, String partName,int progress, int partNumber, int numberQuestion ) {
+    public Part(int partResIdImage, String partName, int progress, int partNumber, int numberQuestion) {
         this.progress = progress;
         this.partResIdImage = partResIdImage;
         this.partNumber = "Part " + partNumber;

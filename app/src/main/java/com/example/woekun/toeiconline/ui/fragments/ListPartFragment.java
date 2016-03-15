@@ -2,7 +2,6 @@ package com.example.woekun.toeiconline.ui.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,13 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.woekun.toeiconline.R;
-import com.example.woekun.toeiconline.customs.RecyclerItemClickListener;
 import com.example.woekun.toeiconline.adapters.PartListAdapter;
+import com.example.woekun.toeiconline.customs.RecyclerItemClickListener;
 import com.example.woekun.toeiconline.ui.activities.LobbyActivity;
 
 public class ListPartFragment extends Fragment {
 
-    public  ListPartFragment() {
+    public ListPartFragment() {
         // Required empty public constructor
     }
 
@@ -27,7 +26,7 @@ public class ListPartFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((LobbyActivity)getActivity()).setTitle("TRAINING");
+        ((LobbyActivity) getActivity()).setTitle("TRAINING");
     }
 
     @Override
@@ -39,11 +38,10 @@ public class ListPartFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Training");
         initRecyclerView(view);
     }
 
-    private void initRecyclerView(View view){
+    private void initRecyclerView(View view) {
         RecyclerView mRecyclerView = (RecyclerView) view.findViewById(R.id.part_list);
         mRecyclerView.setHasFixedSize(true);
 
@@ -58,7 +56,6 @@ public class ListPartFragment extends Fragment {
                     public void onItemClick(View view, int position) {
                         getFragmentManager().beginTransaction()
                                 .replace(R.id.main, QuestionFragment.newInstance(position + 1))
-                                .addToBackStack(null)
                                 .commit();
                     }
                 })

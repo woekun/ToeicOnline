@@ -1,8 +1,6 @@
 package com.example.woekun.toeiconline.models;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Question {
 
@@ -14,11 +12,11 @@ public class Question {
     private String image;
     private ArrayList<SubQuestion> subQuestionList;
 
-    public Question(){
+    public Question() {
 
     }
 
-    public Question(int questionID,int level, int part, String paragraph, ArrayList<SubQuestion> subQuestionList, String image, String audio) {
+    public Question(int questionID, int level, int part, String paragraph, ArrayList<SubQuestion> subQuestionList, String image, String audio) {
         this.questionID = questionID;
         this.level = level;
         this.part = part;

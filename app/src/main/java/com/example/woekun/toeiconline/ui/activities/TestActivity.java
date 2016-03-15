@@ -9,15 +9,10 @@ import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.woekun.toeiconline.AppController;
 import com.example.woekun.toeiconline.Const;
@@ -54,7 +49,24 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
     private ArrayList<ArrayList<Question>> allQuestionForTest;
     private long totalDuration;
     private long leftTime;
-    private int limit = 0;
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            if (mediaPlayer != null) {
+                long currentDuration = mediaPlayer.getCurrentPosition();
+
+                songProgressText.setText(String.format("%s/%s",
+                        Utils.milliSecondsToTimer(currentDuration),
+                        Utils.milliSecondsToTimer(totalDuration)));
+
+                // Updating progress bar
+                int progress = (Utils.getProgressPercentage(currentDuration, totalDuration));
+                songProgressBar.setProgress(progress);
+
+                // Running this thread after 100 milliseconds
+                mHandler.postDelayed(this, 100);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +94,7 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
 
         testPagerAdapter = new TestPagerAdapter(getSupportFragmentManager(), allQuestionForTest);
         mViewPager = (SwipeCustomizableViewPager) findViewById(R.id.container);
-//        mViewPager.setPagingEnabled(false);
+        mViewPager.setPagingEnabled(false);
         mViewPager.setAdapter(testPagerAdapter);
 
         audioLayout = (LinearLayout) findViewById(R.id.seek_bar_view);
@@ -153,7 +165,6 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
         return Integer.valueOf(partId) <= 4;
     }
 
-
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
@@ -165,56 +176,9 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
         mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
     }
 
-    public class onPageChangeListener implements ViewPager.OnPageChangeListener {
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            if (position < allQuestionForTest.get(0).size()) {
-                setAudio(allQuestionForTest.get(0).get(position).getAudio());
-            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size()) {
-                setAudio(allQuestionForTest.get(1).get(position - allQuestionForTest.get(0).size()).getAudio());
-            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size() + allQuestionForTest.get(2).size()) {
-                setAudio(allQuestionForTest.get(2).get(position - allQuestionForTest.get(0).size() - allQuestionForTest.get(1).size()).getAudio());
-            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size() + allQuestionForTest.get(2).size() + allQuestionForTest.get(3).size()) {
-                setAudio(allQuestionForTest.get(3).get(position - allQuestionForTest.get(0).size() - allQuestionForTest.get(1).size() - allQuestionForTest.get(2).size()).getAudio());
-            } else {
-                audioLayout.setVisibility(View.GONE);
-            }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
-    }
-
     private void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }
-
-    private Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {
-            if (mediaPlayer != null) {
-                long currentDuration = mediaPlayer.getCurrentPosition();
-
-                songProgressText.setText(String.format("%s/%s",
-                        Utils.milliSecondsToTimer(currentDuration),
-                        Utils.milliSecondsToTimer(totalDuration)));
-
-                // Updating progress bar
-                int progress = (Utils.getProgressPercentage(currentDuration, totalDuration));
-                songProgressBar.setProgress(progress);
-
-                // Running this thread after 100 milliseconds
-                mHandler.postDelayed(this, 100);
-            }
-        }
-    };
 
     @Override
     public void onBackPressed() {
@@ -261,5 +225,33 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
         }
         appController = null;
         super.onDestroy();
+    }
+
+    public class onPageChangeListener implements ViewPager.OnPageChangeListener {
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            if (position < allQuestionForTest.get(0).size()) {
+                setAudio(allQuestionForTest.get(0).get(position).getAudio());
+            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size()) {
+                setAudio(allQuestionForTest.get(1).get(position - allQuestionForTest.get(0).size()).getAudio());
+            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size() + allQuestionForTest.get(2).size()) {
+                setAudio(allQuestionForTest.get(2).get(position - allQuestionForTest.get(0).size() - allQuestionForTest.get(1).size()).getAudio());
+            } else if (position < allQuestionForTest.get(0).size() + allQuestionForTest.get(1).size() + allQuestionForTest.get(2).size() + allQuestionForTest.get(3).size()) {
+                setAudio(allQuestionForTest.get(3).get(position - allQuestionForTest.get(0).size() - allQuestionForTest.get(1).size() - allQuestionForTest.get(2).size()).getAudio());
+            } else {
+                audioLayout.setVisibility(View.GONE);
+            }
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
     }
 }

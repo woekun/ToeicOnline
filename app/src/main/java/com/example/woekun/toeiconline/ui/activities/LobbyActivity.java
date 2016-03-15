@@ -1,37 +1,33 @@
 package com.example.woekun.toeiconline.ui.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.woekun.toeiconline.APIs;
 import com.example.woekun.toeiconline.AppController;
 import com.example.woekun.toeiconline.Const;
 import com.example.woekun.toeiconline.R;
 import com.example.woekun.toeiconline.models.User;
-import com.example.woekun.toeiconline.ui.fragments.AnalyzeFragment;
 import com.example.woekun.toeiconline.ui.fragments.InformationFragment;
 import com.example.woekun.toeiconline.ui.fragments.ListPartFragment;
-import com.example.woekun.toeiconline.ui.fragments.QuestionFragment;
 import com.example.woekun.toeiconline.ui.fragments.RankingFragment;
 import com.example.woekun.toeiconline.utils.DialogUtils;
-import com.example.woekun.toeiconline.utils.Utils;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -47,8 +43,6 @@ public class LobbyActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private TextView title;
 
-    private Bitmap bitmap;
-    private String mEmail;
     private String filePath;
     private String type;
 
@@ -60,11 +54,8 @@ public class LobbyActivity extends AppCompatActivity
         Intent intent = getIntent();
 
         appController = AppController.getInstance();
-        mEmail = appController.getSharedPreferences().getString("email", null);
-        if (mEmail != null) {
-            currentUser = appController.getDatabaseHelper().getUser(mEmail);
-            filePath = currentUser.getAvatar();
-        }
+        currentUser = appController.getCurrentUser();
+        filePath = currentUser.getAvatar();
 
         if (intent != null) {
             type = intent.getExtras().getString(Const.TYPE);
@@ -91,20 +82,24 @@ public class LobbyActivity extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         ava = (CircleImageView) headerView.findViewById(R.id.imageView);
         ava.setOnClickListener(this);
-        if (!filePath.equals("")) {
-            ava.setImageBitmap(BitmapFactory.decodeFile(filePath));
-        }
+        filePath = currentUser.getAvatar();
+        if (filePath != null && !filePath.equals("")) {
+            appController.getPicasso().load(currentUser.getAvatar()).into(ava);
+        } else
+            appController.getPicasso().load(R.drawable.hughjackman).into(ava);
 
         name = (TextView) headerView.findViewById(R.id.nav_name);
+        name.setText(currentUser.getName());
         name.setOnClickListener(this);
 
         email = (TextView) headerView.findViewById(R.id.nav_email);
+        email.setText(currentUser.getEmail());
         email.setOnClickListener(this);
 
         title = (TextView) findViewById(R.id.title);
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         this.title.setText(title);
     }
 
@@ -112,13 +107,13 @@ public class LobbyActivity extends AppCompatActivity
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         switch (type) {
             case Const.TRAIN:
-                tx.replace(R.id.main, ListPartFragment.newInstance());
+                tx.add(R.id.main, ListPartFragment.newInstance());
                 break;
             case Const.RANK:
-                tx.replace(R.id.main, RankingFragment.newInstance());
+                tx.add(R.id.main, RankingFragment.newInstance());
                 break;
             case Const.INFO:
-                tx.replace(R.id.main, InformationFragment.newInstance());
+                tx.add(R.id.main, InformationFragment.newInstance());
                 break;
         }
         tx.commit();
@@ -142,13 +137,13 @@ public class LobbyActivity extends AppCompatActivity
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         switch (item.getItemId()) {
             case R.id.nav_training:
-                ft.replace(R.id.main, ListPartFragment.newInstance()).addToBackStack(null).commit();
+                ft.replace(R.id.main, ListPartFragment.newInstance()).commit();
                 break;
             case R.id.nav_test:
-                DialogUtils.dialogTestConfirm(this, "Are you sure you want to test?", 4);
+                DialogUtils.dialogTestConfirm(this, "Are you sure you want to test?", 4, false, false);
                 break;
             case R.id.nav_info:
-                ft.replace(R.id.main, InformationFragment.newInstance()).addToBackStack(null).commit();
+                ft.replace(R.id.main, InformationFragment.newInstance()).commit();
                 break;
             case R.id.nav_logout:
                 finish();
@@ -157,9 +152,7 @@ public class LobbyActivity extends AppCompatActivity
                         | Intent.FLAG_ACTIVITY_SINGLE_TOP
                         | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                break;
-            case R.id.nav_analyze:
-                ft.replace(R.id.main, AnalyzeFragment.newInstance()).addToBackStack(null).commit();
+                appController.getSharedPreferences().edit().clear().apply();
                 break;
         }
 
@@ -174,7 +167,8 @@ public class LobbyActivity extends AppCompatActivity
             case R.id.imageView:
                 showFileChooser();
                 break;
-            case R.id.nav_email:case R.id.nav_name:
+            case R.id.nav_email:
+            case R.id.nav_name:
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.main, InformationFragment.newInstance()).addToBackStack(null).commit();
                 drawer.closeDrawer(GravityCompat.START);
@@ -203,11 +197,22 @@ public class LobbyActivity extends AppCompatActivity
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 filePath = cursor.getString(columnIndex);
                 cursor.close();
-                User user = new User();
-                user.setEmail(mEmail);
-                user.setAvatar(filePath);
-                appController.getDatabaseHelper().updateUser(user);
-                ava.setImageBitmap(BitmapFactory.decodeFile(filePath));
+
+                final ProgressDialog progressDialog = DialogUtils.dialogUploadImage(getApplicationContext());
+                APIs.uploadImage(filePath, currentUser.getEmail(), new APIs.UploadCallback() {
+                    @Override
+                    public void onSuccess(String message) {
+                        progressDialog.dismiss();
+                        Toast.makeText(appController, message, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void getImageLink(String link) {
+                        currentUser.setAvatar(link);
+                        appController.getPicasso().load(link).into(ava);
+                        appController.getDatabaseHelper().updateUser(currentUser);
+                    }
+                });
             }
         }
     }

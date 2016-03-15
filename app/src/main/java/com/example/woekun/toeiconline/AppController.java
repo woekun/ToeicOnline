@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.example.woekun.toeiconline.models.User;
 import com.facebook.FacebookSdk;
 import com.squareup.picasso.Picasso;
 
@@ -16,13 +17,17 @@ public class AppController extends Application {
 
     public static final String TAG = AppController.class
             .getSimpleName();
-
-    private RequestQueue mRequestQueue;
     private static AppController mInstance;
-
+    private RequestQueue mRequestQueue;
     private SharedPreferences sharedPreferences;
     private DatabaseHelper databaseHelper;
     private Picasso picasso;
+
+    private User currentUser = null;
+
+    public static synchronized AppController getInstance() {
+        return mInstance;
+    }
 
     @Override
     public void onCreate() {
@@ -35,19 +40,23 @@ public class AppController extends Application {
 
     }
 
-    public static synchronized AppController getInstance() {
-        return mInstance;
+    public User getCurrentUser() {
+        return currentUser;
     }
 
-    public SharedPreferences getSharedPreferences(){
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+
+    public SharedPreferences getSharedPreferences() {
         return sharedPreferences;
     }
 
-    public DatabaseHelper getDatabaseHelper(){
+    public DatabaseHelper getDatabaseHelper() {
         return databaseHelper;
     }
 
-    public Picasso getPicasso(){
+    public Picasso getPicasso() {
         return picasso;
     }
 
@@ -58,15 +67,6 @@ public class AppController extends Application {
 
         return mRequestQueue;
     }
-
-//    public ImageLoader getImageLoader() {
-//        getRequestQueue();
-//        if (mImageLoader == null) {
-//            mImageLoader = new ImageLoader(this.mRequestQueue,
-//                    new LruBitmapCache());
-//        }
-//        return this.mImageLoader;
-//    }
 
     public <T> void addToRequestQueue(Request<T> req, String tag) {
         // set the default tag if tag is empty
@@ -84,6 +84,4 @@ public class AppController extends Application {
             mRequestQueue.cancelAll(tag);
         }
     }
-
-
 }

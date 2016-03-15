@@ -8,7 +8,7 @@ public class Progress {
 
     private int isTrue;
 
-    public Progress(){
+    public Progress() {
 
     }
 

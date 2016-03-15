@@ -1,7 +1,6 @@
 package com.example.woekun.toeiconline.models;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class SubQuestion {
@@ -14,7 +13,7 @@ public class SubQuestion {
     private String explainAnswer;
     private int answerPicked;
 
-    public SubQuestion(){
+    public SubQuestion() {
 
     }
 

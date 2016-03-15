@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
 
 import com.example.woekun.toeiconline.models.Progress;
 import com.example.woekun.toeiconline.models.Question;
@@ -14,8 +13,6 @@ import com.example.woekun.toeiconline.models.SubQuestion;
 import com.example.woekun.toeiconline.models.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private final static int DB_VERSION = 1;
@@ -51,9 +48,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private final static String RESULT = "result";
     private final static String EXPLAIN_ANSWER = "explain_answer";
 
-    // Table Test Question
-    private final static String TABLE_QUESTION_TEST = "table_question_test";
-
     // Table Progress train/test
     private final static String TABLE_PROGRESS_TEST = "progress_test";
     private final static String TABLE_PROGRESS = "progress";
@@ -63,7 +57,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Table Score
     private final static String TABLE_SCORE = "score_table";
-    private final static String SCORE = "score";
+    private final static String SCORE_PART1 = "score_part1";
+    private final static String SCORE_PART2 = "score_part2";
+    private final static String SCORE_PART3 = "score_part3";
+    private final static String SCORE_PART4 = "score_part4";
+    private final static String SCORE_PART5 = "score_part5";
+    private final static String SCORE_PART6 = "score_part6";
+    private final static String SCORE_PART7 = "score_part7";
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -106,13 +106,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + SUB_QUESTION_ID + " INTEGER UNIQUE,"
                 + ANSWER_PICKED + " INTEGER)";
 
-        String CREATE_TABLE_TEST_QUESTION = "CREATE TABLE IF NOT EXISTS " + TABLE_QUESTION_TEST + "("
-                + ID + " INTEGER PRIMARY KEY,"
-                + LEVEL + " INTEGER,"
-                + PART + " INTEGER,"
-                + PARAGRAPH + " TEXT,"
-                + IMAGE + " TEXT,"
-                + AUDIO + " TEXT)";
 
         String CREATE_PROGRESS_TEST_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PROGRESS_TEST + "("
                 + ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -124,7 +117,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String CREATE_SCORE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_SCORE + "("
                 + ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + EMAIL + " TEXT,"
-                + SCORE + " INTEGER)";
+                + SCORE_PART1 + " INTEGER,"
+                + SCORE_PART2 + " INTEGER,"
+                + SCORE_PART3 + " INTEGER,"
+                + SCORE_PART4 + " INTEGER,"
+                + SCORE_PART5 + " INTEGER,"
+                + SCORE_PART6 + " INTEGER,"
+                + SCORE_PART7 + " INTEGER)";
+
 
         String CREATE_INDEX_QUESTION = "CREATE INDEX " + ID + " ON " + TABLE_SUB_QUESTION + "(" + QUESTION_ID + ")";
 
@@ -133,7 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_SUB_QUESTION_TABLE);
         db.execSQL(CREATE_INDEX_QUESTION);
         db.execSQL(CREATE_PROGRESS_TABLE);
-        db.execSQL(CREATE_TABLE_TEST_QUESTION);
+
         db.execSQL(CREATE_PROGRESS_TEST_TABLE);
         db.execSQL(CREATE_SCORE_TABLE);
     }
@@ -143,7 +143,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //drop old table
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SUB_QUESTION);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTION_TEST);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROGRESS_TEST);
         // recreate database
         onCreate(db);
@@ -204,30 +203,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int updateUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put(NAME, user.getName());
         values.put(AVATAR, user.getAvatar());
-        return db.update(TABLE_USER, values, EMAIL + " = ?",
-                new String[]{user.getEmail()});
-    }
-
-    public String getAvatar(String email){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_USER, new String[]{AVATAR},
-                EMAIL + "=?", new String[]{email}, null, null, null, null);
-        String path = null;
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-
-            path = cursor.getString(0);
-            cursor.close();
-        }
-        return path;
-    }
-
-    public int updateUserLevel(User user) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
         values.put(LEVEL, user.getLevel());
-
+        values.put(ADDRESS, user.getAddress());
+        values.put(PHONE, user.getPhone());
         return db.update(TABLE_USER, values, EMAIL + " = ?",
                 new String[]{user.getEmail()});
     }
@@ -419,26 +399,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Table Test Question methods
-     */
-    public void addTestQuestion(ArrayList<Question> questions) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        for (Question question : questions) {
-            ContentValues values = new ContentValues();
-            values.put(ID, question.getQuestionID());
-            values.put(LEVEL, question.getLevel());
-            values.put(PART, question.getPart());
-            values.put(PARAGRAPH, question.getParagraph());
-            values.put(IMAGE, question.getImage());
-            values.put(AUDIO, question.getAudio());
-
-            db.insert(TABLE_QUESTION_TEST, null, values);
-            addSubQuestion(question.getSubQuestionList());
-        }
-    }
-
-    /**
      * Table Progress Test methods
      */
     public void setProgressTest(Progress progress) {
@@ -467,19 +427,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return progress;
     }
 
-    public HashMap<String,Long> getTrueQuantity(){
-        HashMap<String,Long> trueQuantities = new HashMap<>();
-        for(int i=0;i<7;i++){
-            trueQuantities.put(PART+(i+1),getTrueQuantityByPart(String.valueOf(i+1)));
-        }
-        return trueQuantities;
-    }
-
     public long getTrueQuantityByPart(String part) {
         return DatabaseUtils.queryNumEntries(
                 this.getReadableDatabase(),
                 TABLE_PROGRESS_TEST, PART + "=? AND " + TRUE + "=?",
-                new String[]{part,"1"});
+                new String[]{part, "1"});
     }
 
     public void dropTableTestProgress() {
@@ -490,11 +442,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Table Score methods
      */
-    public void addScore(String email, int score) {
+    public void addScore(String email, long score1, long score2, long score3, long score4, long score5, long score6, long score7) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(EMAIL, email);
-        values.put(SCORE, score);
+        values.put(SCORE_PART1, score1);
+        values.put(SCORE_PART2, score2);
+        values.put(SCORE_PART3, score3);
+        values.put(SCORE_PART4, score4);
+        values.put(SCORE_PART5, score5);
+        values.put(SCORE_PART6, score6);
+        values.put(SCORE_PART7, score7);
 
         db.insert(TABLE_SCORE, null, values);
     }
@@ -503,7 +461,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Integer> scores = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_SCORE, new String[]{SCORE},
+        Cursor cursor = db.query(TABLE_SCORE, new String[]{"*"},
                 EMAIL + "=?", new String[]{email}, null, null, null, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
