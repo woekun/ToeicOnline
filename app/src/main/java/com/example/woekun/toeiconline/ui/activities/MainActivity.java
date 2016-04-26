@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(MainActivity.this, "Press back once more to exit.", Toast.LENGTH_SHORT).show();
         } else if (i > 1) {
             finish();
-            super.onBackPressed();
         }
     }
 

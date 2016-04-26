@@ -24,27 +24,30 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginRight="16dp"
                 android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="8dp"
                 android:layout_weight="1">
+
                 <TextView
                     android:id="@+id/question_position"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Question 1: "
                     android:layout_gravity="center_vertical"
+                    android:text="Question 1: "
+                    android:textColor="#000"
                     android:textSize="16sp"
                     android:textStyle="bold" />
+
                 <ImageButton
                     android:id="@+id/check"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
+                    android:background="@drawable/check_button_background"
                     android:padding="8dp"
                     android:scaleType="fitCenter"
-                    android:background="@drawable/check_button_background"
-                    android:src="@drawable/ic_search_24dp"/>
+                    android:src="@drawable/ic_search_24dp" />
             </FrameLayout>
 
 
@@ -66,7 +69,7 @@
                     android:layout_marginBottom="16dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:text="@string/test_text" />
+                    android:textColor="#000" />
             </FrameLayout>
 
 
@@ -86,25 +89,29 @@
                     android:id="@+id/option1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="A"/>
+                    android:text="A"
+                    android:textColor="#000" />
 
                 <RadioButton
                     android:id="@+id/option2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="B"/>
+                    android:text="B"
+                    android:textColor="#000" />
 
                 <RadioButton
                     android:id="@+id/option3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="C"/>
+                    android:text="C"
+                    android:textColor="#000" />
 
                 <RadioButton
                     android:id="@+id/option4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="D"/>
+                    android:text="D"
+                    android:textColor="#000" />
             </RadioGroup>
         </LinearLayout>
 

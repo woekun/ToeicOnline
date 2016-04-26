@@ -29,6 +29,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:textColor="#000"
                         android:id="@+id/question_position_paragraph"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -38,6 +39,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:textColor="#000"
                         android:id="@+id/paragraph"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

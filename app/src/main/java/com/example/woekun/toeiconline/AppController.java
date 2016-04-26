@@ -34,7 +34,7 @@ public class AppController extends Application {
         super.onCreate();
         mInstance = this;
         sharedPreferences = getSharedPreferences("Toeic_Online", Activity.MODE_PRIVATE);
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = DatabaseHelper.getInstance(this);
         picasso = Picasso.with(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
 

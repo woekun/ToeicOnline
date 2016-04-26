@@ -201,19 +201,32 @@ public class QuestionView extends LinearLayout {
                             (answerField.getChildAt(answerPicked[0] - 1)).setBackgroundColor(Color.WHITE);
 
                         (answerField.getChildAt(subQuestion.getResult() - 1)).setBackgroundColor(Color.WHITE);
+
+                        String[] temp = {"A","B","C","D"};
+                        for(int i = 0; i<answerField.getChildCount(); i++){
+                            ((RadioButton)(answerField.getChildAt(i))).setText(temp[i]);
+                        }
                     } else {
                         isChecked = true;
                         if (answerPicked[0] > 0)
                             (answerField.getChildAt(answerPicked[0] - 1)).setBackgroundColor(Color.RED);
 
                         (answerField.getChildAt(subQuestion.getResult() - 1)).setBackgroundColor(Color.GREEN);
+
+                        for(int i = 0; i<subQuestion.getAnswerList().size(); i++){
+                            String s = subQuestion.getAnswerList().get(i);
+                            ((RadioButton)(answerField.getChildAt(i))).setText(s);
+                        }
                     }
+
                 }
             });
         } else {
             check.setVisibility(View.GONE);
         }
     }
+
+
 
     private void setContent(SubQuestion subQuestion) {
         final TextView content = (TextView) card.findViewById(R.id.text_question);

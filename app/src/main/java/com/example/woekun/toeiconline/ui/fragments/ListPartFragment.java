@@ -56,6 +56,7 @@ public class ListPartFragment extends Fragment {
                     public void onItemClick(View view, int position) {
                         getFragmentManager().beginTransaction()
                                 .replace(R.id.main, QuestionFragment.newInstance(position + 1))
+                                .addToBackStack(null)
                                 .commit();
                     }
                 })

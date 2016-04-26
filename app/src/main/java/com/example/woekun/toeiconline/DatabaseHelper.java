@@ -15,6 +15,8 @@ import com.example.woekun.toeiconline.models.User;
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
+    private static DatabaseHelper databaseHelper;
+
     private final static int DB_VERSION = 1;
     private final static String DB_NAME = "TOEIC.db";
 
@@ -67,6 +69,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    public static synchronized DatabaseHelper getInstance(Context context){
+        if(databaseHelper==null){
+            databaseHelper = new DatabaseHelper(context);
+        }
+        return databaseHelper;
     }
 
     @Override
