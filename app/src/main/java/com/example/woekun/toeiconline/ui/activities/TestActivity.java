@@ -49,6 +49,7 @@ public class TestActivity extends AppCompatActivity implements MediaPlayer.OnPre
     private ArrayList<ArrayList<Question>> allQuestionForTest;
     private long totalDuration;
     private long leftTime;
+
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             if (mediaPlayer != null) {

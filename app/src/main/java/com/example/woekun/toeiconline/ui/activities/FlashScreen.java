@@ -48,8 +48,8 @@ public class FlashScreen extends AppCompatActivity {
 
             @Override
             public void onFailed(VolleyError error) {
-                finish();
                 Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }

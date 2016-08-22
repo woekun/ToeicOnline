@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -72,7 +72,7 @@
             style="?android:textAppearanceMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="40dp"
             android:background="@drawable/button_login_normal_background"
             android:text="@string/action_sign_in"
             android:textColor="#ffffff"
@@ -107,7 +107,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/button_login_fb_background2"
-            android:drawableLeft="@mipmap/ic_facebook" />
+            android:drawableLeft="@mipmap/ic_facebook"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btn_google"
@@ -121,17 +122,19 @@
             android:text="@string/sign_in_with_gg"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:onClick="signUp"
-            android:paddingTop="16dp"
-            android:text="@string/sign_up_if_needed"
-            android:textColor="#FFFFFF" />
-
+            android:textStyle="bold"
+            android:visibility="gone" />
     </LinearLayout>
-</ScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/email_login_form"
+        android:gravity="center_horizontal|bottom"
+        android:onClick="signUp"
+        android:paddingBottom="16dp"
+        android:text="@string/sign_up_if_needed"
+        android:textColor="#FFFFFF" />
+</RelativeLayout>
 
